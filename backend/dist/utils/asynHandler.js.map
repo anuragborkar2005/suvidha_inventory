@@ -1,0 +1,1 @@
+{"version":3,"file":"asynHandler.js","sourceRoot":"","sources":["../../src/utils/asynHandler.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,MAAM,YAAY,GAAG,CAAC,cAAwB,EAAE,EAAE;IACvD,OAAO,CAAC,GAAY,EAAE,GAAa,EAAE,IAAkB,EAAE,EAAE,CACzD,OAAO,CAAC,OAAO,CAAC,cAAc,CAAC,GAAG,EAAE,GAAG,EAAE,IAAI,CAAC,CAAC,CAAC,KAAK,CAAC,IAAI,CAAC,CAAC;AAChE,CAAC,CAAC"}
