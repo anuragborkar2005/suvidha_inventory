@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,13 +13,14 @@ enum Role {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(255)
-  email      String   @unique
-  password   String   @db.VarChar(255)
-  role       Role     @default(STAFF)
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  email        String   @unique
+  password     String   @db.VarChar(255)
+  role         Role     @default(STAFF)
   refreshToken String?
-  created_at DateTime @default(now())
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
 
 model Product {
@@ -31,16 +31,20 @@ model Product {
   profit         Decimal  @db.Decimal(10,2)
   stock_quantity Int
   created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
   sales          Sale[]
 }
 
 model Sale {
   id          Int      @id @default(autoincrement())
   product_id  Int
-  sold_by     Int
   quantity    Int
   total_price Decimal  @db.Decimal(10,2)
   total_cost  Decimal  @db.Decimal(10,2)
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
   product     Product  @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
 }
