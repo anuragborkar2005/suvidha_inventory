@@ -56,9 +56,13 @@ export const login = async (req: Request, res: Response) => {
     throw new ApiError(401, 'Invalid credentials');
   }
 
-  const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY!, {
-    expiresIn: '12h',
-  });
+  const accessToken = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET_KEY!,
+    {
+      expiresIn: '12h',
+    }
+  );
 
   const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY!, {
     expiresIn: '7d',
@@ -78,6 +82,7 @@ export const login = async (req: Request, res: Response) => {
   };
 
   res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie('accessToken', refreshToken, cookieOptions);
 
   return res.json({ accessToken });
 };

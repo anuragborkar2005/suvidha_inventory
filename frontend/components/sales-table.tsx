@@ -1,0 +1,139 @@
+"use client";
+
+import { useSales } from "@/lib/use-sales";
+import { useProducts } from "@/lib/use-products";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+interface SalesTableProps {
+  filter: "all" | "today" | "week";
+}
+
+export function SalesTable({ filter }: SalesTableProps) {
+  const { sales } = useSales();
+  const { products } = useProducts();
+
+  const filteredSales = sales.filter((sale) => {
+    const saleDate = new Date(sale.created_at);
+    const now = new Date();
+
+    if (filter === "today") {
+      return saleDate.toDateString() === now.toDateString();
+    }
+
+    if (filter === "week") {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return saleDate >= weekAgo;
+    }
+
+    return true;
+  });
+
+  const totalRevenue = filteredSales.reduce(
+    (sum, sale) => sum + sale.total_price,
+    0
+  );
+  const totalItems = filteredSales.reduce(
+    (sum, sale) => sum + sale.quantity,
+    0
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Total Sales</p>
+          <p className="text-2xl font-semibold text-foreground">
+            {filteredSales.length}
+          </p>
+        </Card>
+        <Card className="border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Items Sold</p>
+          <p className="text-2xl font-semibold text-foreground">{totalItems}</p>
+        </Card>
+        <Card className="border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Total Revenue</p>
+          <p className="text-2xl font-semibold text-foreground">
+            ${totalRevenue.toFixed(2)}
+          </p>
+        </Card>
+      </div>
+
+      <Card className="border-border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-muted-foreground">
+                Date & Time
+              </TableHead>
+              <TableHead className="text-muted-foreground">Product</TableHead>
+              <TableHead className="text-muted-foreground">Quantity</TableHead>
+              <TableHead className="text-muted-foreground">
+                Price/Unit
+              </TableHead>
+              <TableHead className="text-muted-foreground">Total</TableHead>
+              <TableHead className="text-muted-foreground">Sold By</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredSales.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
+                  No sales found for this period
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredSales.map((sale) => {
+                const product = products.find((p) => p.id === sale.product_id);
+                const saleDate = new Date(sale.created_at);
+
+                return (
+                  <TableRow key={sale.id} className="border-border">
+                    <TableCell className="text-foreground">
+                      <div className="space-y-1">
+                        <p className="font-medium">
+                          {saleDate.toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {saleDate.toLocaleTimeString()}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-foreground">
+                      {product?.name || "Unknown Product"}
+                    </TableCell>
+                    <TableCell className="text-foreground">
+                      {sale.quantity}
+                    </TableCell>
+                    <TableCell className="text-foreground">
+                      ${sale.pricePerUnit.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="font-semibold text-foreground">
+                      ${sale.total_price.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="capitalize">
+                        {sale.sold_by}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}

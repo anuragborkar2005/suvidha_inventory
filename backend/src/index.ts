@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
   credentials: true,
-  origin: ['http:://localhost:3000'],
+  origin: ['http://localhost:3000', 'http://localhost:4000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 };
 app.use(cors(corsOptions));
@@ -40,10 +40,10 @@ app.use(
   })
 );
 
-app.use('/v1/api', healthCheckRouter);
-app.use('/v1/api', userRouter);
-app.use('/v1/api', productRouter);
-app.use('/v1/api', salesRouter);
+app.use('/api', healthCheckRouter);
+app.use('/api', userRouter);
+app.use('/api', productRouter);
+app.use('/api', salesRouter);
 
 app.listen(process.env.PORT, () => {
   logger.info(`Server running on port ${process.env.PORT}`);
