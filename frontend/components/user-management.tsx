@@ -91,7 +91,7 @@ export function UserManagement() {
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={user.role === "admin" ? "accent" : "secondary"}
+                    variant={user.role === "admin" ? "default" : "secondary"}
                     className="capitalize"
                   >
                     {user.role}
