@@ -43,6 +43,7 @@ export function useSales() {
     try {
       await api.post("/sales", sale);
       fetchSales();
+      fetchSales();
     } catch (err) {
       console.error(" Failed to add sale:", err);
     }
@@ -60,7 +61,7 @@ export function useSales() {
     return sales
       .filter((s) => new Date(s.created_at).toDateString() === today)
       .reduce((sum, s) => {
-        const profit = s.product?.profit ?? s.total_price - s.total_cost;
+        const profit = s.total_price - s.total_cost;
         return sum + profit;
       }, 0);
   };

@@ -8,9 +8,9 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 export const register = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
 
-  if (!username || !password) {
+  if (!username || !password || !role) {
     throw new ApiError(400, 'All fields are required');
   }
 
@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response) => {
     data: {
       name: username,
       email: username,
-      role: Role.staff,
+      role: role,
       password: hashedPassword,
     },
   });

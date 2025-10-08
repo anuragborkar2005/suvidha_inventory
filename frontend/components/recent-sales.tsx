@@ -33,7 +33,7 @@ export function RecentSales() {
           ) : (
             recentSales.map((sale) => {
               const product = products.find(
-                (p) => String(p.id) === sale.product_id
+                (p) => p.id === Number(sale.product_id)
               );
               return (
                 <div
@@ -54,7 +54,7 @@ export function RecentSales() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-foreground">
-                      ₹{sale.total_price.toFixed(2)}
+                      ₹{Number(sale.total_price ?? 0).toFixed(2)}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(sale.created_at).toLocaleDateString()}

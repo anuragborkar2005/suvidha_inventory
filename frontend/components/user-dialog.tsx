@@ -3,7 +3,8 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { useUsers, type User } from "@/lib/use-users";
+import { useUsers } from "@/lib/use-users";
+import { User } from "@/lib/auth-context";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +33,7 @@ interface UserDialogProps {
 export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
   const { addUser, updateUser } = useUsers();
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
     role: "staff" as "admin" | "staff",
   });
@@ -41,13 +42,13 @@ export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username,
+        email: user.email,
         password: "",
         role: user.role,
       });
     } else {
       setFormData({
-        username: "",
+        email: "",
         password: "",
         role: "staff",
       });
@@ -55,7 +56,7 @@ export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
     setError("");
   }, [user, isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -64,25 +65,19 @@ export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
       return;
     }
 
-    if (user) {
-      updateUser(user.username, {
-        role: formData.role,
-        ...(formData.password && { password: formData.password }),
-      });
-    } else {
-      const success = addUser({
-        username: formData.username,
-        password: formData.password,
-        role: formData.role,
-      });
-
-      if (!success) {
-        setError("Username already exists");
-        return;
+    try {
+      if (user) {
+        await updateUser(user.id, {
+          role: formData.role,
+          ...(formData.password && { password: formData.password }),
+        });
+      } else {
+        await addUser(formData.email, formData.password, formData.role);
       }
+      onClose();
+    } catch (err) {
+      setError("An error occurred. Please try again.");
     }
-
-    onClose();
   };
 
   return (
@@ -100,12 +95,13 @@ export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="username"
-              value={formData.username}
+              id="email"
+              type="email"
+              value={formData.email}
               onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
+                setFormData({ ...formData, email: e.target.value })
               }
               required
               disabled={!!user}

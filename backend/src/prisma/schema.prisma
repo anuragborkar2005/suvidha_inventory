@@ -45,7 +45,7 @@ model Sale {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  product     Product  @relation(fields: [product_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
   @@index([product_id])
 }

@@ -1,55 +1,59 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-
-export interface User {
-  username: string;
-  password: string;
-  role: "admin" | "staff";
-}
-
-const INITIAL_USERS: User[] = [
-  { username: "admin", password: "admin123", role: "admin" },
-  { username: "staff", password: "staff123", role: "staff" },
-];
+import api from "@/services/api";
+import { User } from "./auth-context";
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
 
-  const fetchStaff = useCallback(async () => {}, []);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("shop_users");
-    if (stored) {
-      setUsers(JSON.parse(stored));
-    } else {
-      setUsers(INITIAL_USERS);
-      localStorage.setItem("shop_users", JSON.stringify(INITIAL_USERS));
+  const fetchStaff = useCallback(async () => {
+    try {
+      const response = await api.get("/staff");
+      setUsers(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch staff", error);
     }
   }, []);
 
-  const addUser = (user: User): boolean => {
-    if (users.some((u) => u.username === user.username)) {
-      return false;
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
+
+  const addUser = async (
+    email: string,
+    password: string,
+    role: "admin" | "staff"
+  ) => {
+    try {
+      const res = await api.post("/register", {
+        username: email,
+        password,
+        role,
+      });
+      console.log(res);
+      fetchStaff();
+    } catch (error) {
+      console.error("Failed to add user", error);
     }
-    const updated = [...users, user];
-    setUsers(updated);
-    localStorage.setItem("shop_users", JSON.stringify(updated));
-    return true;
   };
 
-  const updateUser = (username: string, updates: Partial<User>) => {
-    const updated = users.map((u) =>
-      u.username === username ? { ...u, ...updates } : u
-    );
-    setUsers(updated);
-    localStorage.setItem("shop_users", JSON.stringify(updated));
+  const updateUser = async (id: string, updates: Partial<User>) => {
+    try {
+      await api.patch(`/user/${id}`, updates);
+      fetchStaff();
+    } catch (error) {
+      console.error("Failed to update user", error);
+    }
   };
 
-  const deleteUser = (username: string) => {
-    const updated = users.filter((u) => u.username !== username);
-    setUsers(updated);
-    localStorage.setItem("shop_users", JSON.stringify(updated));
+  const deleteUser = async (id: string) => {
+    try {
+      await api.delete(`/user/${id}`);
+      fetchStaff();
+    } catch (error) {
+      console.error("Failed to delete user", error);
+    }
   };
 
   return { users, addUser, updateUser, deleteUser };

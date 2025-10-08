@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUsers, type User } from "@/lib/use-users";
+import { useUsers } from "@/lib/use-users";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { User } from "@/lib/auth-context";
 
 export function UserManagement() {
   const { users, deleteUser } = useUsers();
@@ -48,10 +49,8 @@ export function UserManagement() {
   };
 
   const handleDelete = () => {
-    if (deleteUsername) {
-      deleteUser(deleteUsername);
-      setDeleteUsername(null);
-    }
+    deleteUser(deleteUsername!);
+    setDeleteUsername(null);
   };
 
   return (
@@ -86,9 +85,9 @@ export function UserManagement() {
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.username} className="border-border">
+              <TableRow key={user.id} className="border-border">
                 <TableCell className="font-medium text-foreground">
-                  {user.username}
+                  {user.email}
                 </TableCell>
                 <TableCell>
                   <Badge
@@ -119,8 +118,8 @@ export function UserManagement() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setDeleteUsername(user.username)}
-                      disabled={user.username === "admin"}
+                      onClick={() => setDeleteUsername(user.id)}
+                      disabled={user.role === "admin"}
                       className="text-muted-foreground hover:text-destructive disabled:opacity-50"
                     >
                       <Trash2 className="h-4 w-4" />

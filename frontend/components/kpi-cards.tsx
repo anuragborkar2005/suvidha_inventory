@@ -53,7 +53,7 @@ export function KpiCards() {
     },
     {
       title: "Today's Revenue",
-      value: `₹₹{todayRevenue.toFixed(2)}`,
+      value: `₹${todayRevenue.toFixed(2)}`,
       icon: DollarSign,
       description: "Total revenue today",
       color: "text-primary",

@@ -80,7 +80,9 @@ export function SalesTable({ filter }: SalesTableProps) {
               <TableHead className="text-muted-foreground">
                 Price/Unit
               </TableHead>
-              <TableHead className="text-muted-foreground">Total</TableHead>
+              <TableHead className="text-muted-foreground">
+                Total Sale
+              </TableHead>
               <TableHead className="text-muted-foreground">Sold By</TableHead>
             </TableRow>
           </TableHeader>
@@ -96,11 +98,12 @@ export function SalesTable({ filter }: SalesTableProps) {
               </TableRow>
             ) : (
               filteredSales.map((sale) => {
-                console.log(products);
                 const product = products.find((p) => {
                   return p.id === Number(sale.product_id);
                 });
                 const saleDate = new Date(sale.created_at);
+                const total_sale =
+                  (product?.selling_price ?? 0) * (sale.quantity ?? 0);
 
                 return (
                   <TableRow key={sale.id} className="border-border">
@@ -124,7 +127,7 @@ export function SalesTable({ filter }: SalesTableProps) {
                       ₹{(product?.selling_price ?? 0).toFixed(2)}
                     </TableCell>
                     <TableCell className="font-semibold text-foreground">
-                      ₹{Number(sale.total_price ?? 0).toFixed(2)}
+                      ₹{Number(total_sale).toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="capitalize">
