@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, AlertTriangle, TrendingUp, DollarSign } from "lucide-react";
 import { useProducts } from "@/lib/use-products";
 import { useSales } from "@/lib/use-sales";
+import { cn } from "@/lib/utils";
 
 export function KpiCards() {
   const { products } = useProducts();
@@ -52,7 +53,7 @@ export function KpiCards() {
     },
     {
       title: "Today's Revenue",
-      value: `$${todayRevenue.toFixed(2)}`,
+      value: `₹₹{todayRevenue.toFixed(2)}`,
       icon: DollarSign,
       description: "Total revenue today",
       color: "text-primary",
@@ -82,8 +83,4 @@ export function KpiCards() {
       })}
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }

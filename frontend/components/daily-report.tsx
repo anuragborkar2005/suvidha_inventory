@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { useSales } from "@/lib/use-sales";
-import { useProducts } from "@/lib/use-products";
 import {
   Card,
   CardContent,
@@ -26,7 +25,6 @@ import {
 
 export function DailyReport() {
   const { sales } = useSales();
-  const { products } = useProducts();
 
   const dailyData = useMemo(() => {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -76,7 +74,7 @@ export function DailyReport() {
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardDescription className="text-muted-foreground">
-              Today's Sales
+              Today&apos;s Sales
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
               {todayStats.totalSales}
@@ -90,10 +88,10 @@ export function DailyReport() {
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardDescription className="text-muted-foreground">
-              Today's Revenue
+              Today&apos;s Revenue
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
-              ${todayStats.totalRevenue.toFixed(2)}
+              ₹{todayStats.totalRevenue.toFixed(2)}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -121,7 +119,7 @@ export function DailyReport() {
               Avg Sale Value
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
-              ${todayStats.avgSaleValue.toFixed(2)}
+              ₹{todayStats.avgSaleValue.toFixed(2)}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useEffect } from "react";
 
 interface SalesTableProps {
   filter: "all" | "today" | "week";
@@ -62,12 +63,12 @@ export function SalesTable({ filter }: SalesTableProps) {
         <Card className="border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">Total Revenue</p>
           <p className="text-2xl font-semibold text-foreground">
-            ${totalRevenue.toFixed(2)}
+            ₹{Number(totalRevenue ?? 0).toFixed(2)}
           </p>
         </Card>
       </div>
 
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card px-4 py-4">
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
@@ -95,7 +96,10 @@ export function SalesTable({ filter }: SalesTableProps) {
               </TableRow>
             ) : (
               filteredSales.map((sale) => {
-                const product = products.find((p) => p.id === sale.product_id);
+                console.log(products);
+                const product = products.find((p) => {
+                  return p.id === Number(sale.product_id);
+                });
                 const saleDate = new Date(sale.created_at);
 
                 return (
@@ -117,10 +121,10 @@ export function SalesTable({ filter }: SalesTableProps) {
                       {sale.quantity}
                     </TableCell>
                     <TableCell className="text-foreground">
-                      ${sale.pricePerUnit.toFixed(2)}
+                      ₹{(product?.selling_price ?? 0).toFixed(2)}
                     </TableCell>
                     <TableCell className="font-semibold text-foreground">
-                      ${sale.total_price.toFixed(2)}
+                      ₹{Number(sale.total_price ?? 0).toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="capitalize">

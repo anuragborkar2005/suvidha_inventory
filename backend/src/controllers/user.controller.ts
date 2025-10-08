@@ -11,7 +11,7 @@ export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.json(new ApiError(201, 'All fields are required'));
+    throw new ApiError(400, 'All fields are required');
   }
 
   const existingUser = await prisma.user.findUnique({
@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response) => {
     data: {
       name: username,
       email: username,
-      role: Role.STAFF,
+      role: Role.staff,
       password: hashedPassword,
     },
   });
@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.json(new ApiError(201, 'All fields are required'));
+    throw new ApiError(400, 'All fields are required');
   }
 
   const user = await prisma.user.findUnique({
@@ -118,4 +118,14 @@ export const updatePassword = async (req: Request, res: Response) => {
   }
 
   return res.json(new ApiResponse(200, user, 'Password updated successfully'));
+};
+
+export const getStaff = async (req: Request, res: Response) => {
+  const staff = await prisma.user.findMany({
+    where: { role: Role.staff },
+  });
+  if (!staff) {
+    return res.json(new ApiError(404, 'Staff not found'));
+  }
+  return res.json(new ApiResponse(200, staff, 'Staff fetched successfully'));
 };

@@ -1,37 +1,38 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY!;
+const JWT_SECRET = process.env.JWT_SECRET_KEY || "your-secret-key";
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get("accessToken")?.value;
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get("access_token")?.value;
+  const { pathname } = request.nextUrl;
 
-  // If no token, redirect to login
+  const secret = new TextEncoder().encode(JWT_SECRET);
+
+  // If the user is trying to access the login page
+  if (pathname.startsWith("/login")) {
+    // If the user has a valid token, redirect to the dashboard
+    if (token) {
+      try {
+        await jwtVerify(token, secret, { algorithms: ["HS256"] });
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      } catch {
+        // If the token is invalid, allow access to the login page
+        return NextResponse.next();
+      }
+    }
+    // If there is no token, allow access to the login page
+    return NextResponse.next();
+  }
+
+  // For all other pages, protect them
   if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { role: string };
-
-    const pathname = request.nextUrl.pathname;
-
-    // Admin-only routes
-    if (pathname.startsWith("/admin") && decoded.role !== "admin") {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    // Staff-only routes (admin also allowed)
-    if (
-      pathname.startsWith("/staff") &&
-      decoded.role !== "staff" &&
-      decoded.role !== "admin"
-    ) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    // Authenticated access allowed
+    await jwtVerify(token, secret, { algorithms: ["HS256"] });
     return NextResponse.next();
   } catch (error) {
     console.error("JWT verification failed:", error);
@@ -40,7 +41,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|login).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/login"],
 };

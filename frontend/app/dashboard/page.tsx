@@ -15,7 +15,7 @@ export default function DashboardPage() {
           Dashboard
         </h1>
         <p className="text-muted-foreground">
-          Welcome back, {user?.name}. Here's what's happening with your shop
+          Welcome back, {user?.name}. Here&apos;s what&apos;s happening with your shop
           today.
         </p>
       </div>

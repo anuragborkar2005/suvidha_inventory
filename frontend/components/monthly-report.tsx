@@ -79,7 +79,7 @@ export function MonthlyReport() {
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardDescription className="text-muted-foreground">
-              This Month's Sales
+              This Month&apos;s Sales
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
               {currentMonthStats.totalSales}
@@ -96,7 +96,7 @@ export function MonthlyReport() {
               Monthly Revenue
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
-              ${currentMonthStats.totalRevenue.toFixed(2)}
+              ₹{currentMonthStats.totalRevenue.toFixed(2)}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -126,7 +126,7 @@ export function MonthlyReport() {
               Avg Sale Value
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
-              ${currentMonthStats.avgSaleValue.toFixed(2)}
+              ₹{currentMonthStats.avgSaleValue.toFixed(2)}
             </CardTitle>
           </CardHeader>
           <CardContent>

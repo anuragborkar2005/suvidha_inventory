@@ -48,7 +48,7 @@ export const adminOnly = async (req: Request, res: Response, next: NextFunction)
         where: { id: userId },
         select: { role: true },
       });
-      if (user?.role === Role.ADMIN) {
+      if (user?.role === Role.admin) {
         next();
       } else {
         return res.json(new ApiResponse(403, null, 'Forbidden'));
@@ -74,7 +74,7 @@ export const staffOnly = async (req: Request, res: Response, next: NextFunction)
         where: { id: userId },
         select: { role: true },
       });
-      if (user?.role === Role.STAFF) {
+      if (user?.role === Role.staff) {
         next();
       } else {
         return res.json(new ApiResponse(403, null, 'Forbidden'));

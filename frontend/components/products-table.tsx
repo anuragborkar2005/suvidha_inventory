@@ -32,7 +32,7 @@ interface ProductsTableProps {
 
 export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
   const { products, deleteProduct } = useProducts();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [lowStockThreshold, setLowStockThreshold] = useState(10);
 
   useEffect(() => {
@@ -43,10 +43,8 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
     }
   }, []);
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = () => {
@@ -58,7 +56,7 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
 
   return (
     <>
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card px-4 py-4">
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
@@ -101,10 +99,10 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
                       {product.category}
                     </TableCell>
                     <TableCell className="text-foreground">
-                      ${(product.cost_price ?? 0).toFixed(2)}
+                      ₹{(product.cost_price ?? 0).toFixed(2)}
                     </TableCell>
                     <TableCell className="text-foreground">
-                      ${(product.selling_price ?? 0).toFixed(2)}
+                      ₹{(product.selling_price ?? 0).toFixed(2)}
                     </TableCell>
                     <TableCell className="text-foreground">
                       <div className="flex items-center gap-2">

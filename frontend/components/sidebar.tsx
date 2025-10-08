@@ -13,6 +13,7 @@ import {
   LogOut,
   Store,
 } from "lucide-react";
+import { useOnline } from "@/lib/use-online";
 
 const navigation = [
   {
@@ -52,6 +53,8 @@ export function Sidebar() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
+  const { isOnline } = useOnline();
+
   const handleLogout = () => {
     logout();
     router.push("/login");
@@ -72,7 +75,16 @@ export function Sidebar() {
             Shop Manager
           </h2>
           <p className="text-xs text-muted-foreground capitalize">
-            {user?.role}
+            {user?.role} <br />
+          </p>
+        </div>
+        <div>
+          <p
+            className={`text-xs text-muted-foreground ₹{
+              isOnline ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {isOnline ? "Online" : "Offline"}
           </p>
         </div>
       </div>
@@ -103,7 +115,7 @@ export function Sidebar() {
       <div className="border-t border-border p-4">
         <div className="mb-3 rounded-lg bg-muted p-3">
           <p className="text-sm font-medium text-foreground">{user?.name}</p>
-          <p className="text-xs text-muted-foreground">{user?.username}</p>
+          <p className="text-xs text-muted-foreground">{user?.email}</p>
         </div>
         <Button
           variant="outline"

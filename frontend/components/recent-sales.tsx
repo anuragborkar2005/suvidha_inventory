@@ -32,7 +32,9 @@ export function RecentSales() {
             </p>
           ) : (
             recentSales.map((sale) => {
-              const product = products.find((p) => p.id === sale.product_id);
+              const product = products.find(
+                (p) => String(p.id) === sale.product_id
+              );
               return (
                 <div
                   key={sale.id}
@@ -43,12 +45,16 @@ export function RecentSales() {
                       {product?.name || "Unknown Product"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {sale.quantity} × ${sale.pricePerUnit.toFixed(2)}
+                      {sale?.product?.selling_price !== undefined
+                        ? `${
+                            sale.quantity
+                          } × ₹${sale.product?.selling_price.toFixed(2)}`
+                        : "Price unavailable"}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-foreground">
-                      ${sale.total_price.toFixed(2)}
+                      ₹{sale.total_price.toFixed(2)}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(sale.created_at).toLocaleDateString()}

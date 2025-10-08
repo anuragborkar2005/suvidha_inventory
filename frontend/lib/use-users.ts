@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export interface User {
   username: string;
@@ -15,6 +15,8 @@ const INITIAL_USERS: User[] = [
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
+
+  const fetchStaff = useCallback(async () => {}, []);
 
   useEffect(() => {
     const stored = localStorage.getItem("shop_users");

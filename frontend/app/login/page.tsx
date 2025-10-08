@@ -20,7 +20,7 @@ import { useOnline } from "@/lib/use-online";
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,12 +38,15 @@ export default function LoginPage() {
     setError("");
     setIsLoading(true);
 
-    const success = await login(username, password);
+    const success = await login(email, password);
+    console.log("Login success:", success);
 
     if (success) {
+      console.log("Login to Dashboard");
       router.push("/dashboard");
+      setIsLoading(false);
     } else {
-      setError("Invalid username or password");
+      setError("Invalid email or password");
       setIsLoading(false);
     }
   };
@@ -69,13 +72,13 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="bg-secondary"
               />
@@ -106,16 +109,6 @@ export default function LoginPage() {
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-
-            <div className="rounded-lg bg-muted p-4 text-sm">
-              <p className="mb-2 font-medium text-foreground">
-                Demo Credentials:
-              </p>
-              <div className="space-y-1 text-muted-foreground">
-                <p>Admin: admin / admin123</p>
-                <p>Staff: staff / staff123</p>
-              </div>
-            </div>
           </form>
         </CardContent>
       </Card>

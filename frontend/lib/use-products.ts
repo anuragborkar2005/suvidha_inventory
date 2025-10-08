@@ -1,92 +1,62 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import api from "@/services/api";
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   category: string;
   cost_price: number;
   selling_price: number;
+  profit: number;
   stock_quantity: number;
   created_at: string;
 }
 
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    name: "Wireless Mouse",
-    category: "Electronics",
-    cost_price: 15.0,
-    selling_price: 29.99,
-    stock_quantity: 45,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    name: "Notebook A4",
-    category: "Stationery",
-    cost_price: 2.5,
-    selling_price: 4.99,
-    stock_quantity: 8,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    name: "USB Cable",
-    category: "Electronics",
-    cost_price: 4.0,
-    selling_price: 9.99,
-    stock_quantity: 120,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "4",
-    name: "Desk Lamp",
-    category: "Furniture",
-    cost_price: 18.0,
-    selling_price: 34.99,
-    stock_quantity: 5,
-    created_at: new Date().toISOString(),
-  },
-];
-
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("shop_products");
-    if (stored) {
-      setProducts(JSON.parse(stored));
-    } else {
-      setProducts(INITIAL_PRODUCTS);
-      localStorage.setItem("shop_products", JSON.stringify(INITIAL_PRODUCTS));
+  const fetchProducts = useCallback(async () => {
+    try {
+      const response = await api.get("/product/all");
+      setProducts(response.data.data);
+      // console.log("Products fetched successfully ", response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
     }
   }, []);
 
-  const addProduct = (product: Omit<Product, "id" | "created_at">) => {
-    const newProduct: Product = {
-      ...product,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-    };
-    const updated = [...products, newProduct];
-    setProducts(updated);
-    localStorage.setItem("shop_products", JSON.stringify(updated));
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const addProduct = async (product: Omit<Product, "id" | "created_at">) => {
+    try {
+      await api.post("/product", product);
+      fetchProducts();
+      console.log("Product added successfully");
+    } catch (error) {
+      console.error("Failed to add product", error);
+    }
   };
 
-  const updateProduct = (id: string, updates: Partial<Product>) => {
-    const updated = products.map((p) =>
-      p.id === id ? { ...p, ...updates } : p
-    );
-    setProducts(updated);
-    localStorage.setItem("shop_products", JSON.stringify(updated));
+  const updateProduct = async (id: number, updates: Partial<Product>) => {
+    try {
+      await api.patch(`/product/${id}`, updates);
+      fetchProducts();
+    } catch (error) {
+      console.error("Failed to update product", error);
+    }
   };
 
-  const deleteProduct = (id: string) => {
-    const updated = products.filter((p) => p.id !== id);
-    setProducts(updated);
-    localStorage.setItem("shop_products", JSON.stringify(updated));
+  const deleteProduct = async (id: number) => {
+    try {
+      await api.delete(`/product/${id}`);
+      fetchProducts();
+    } catch (error) {
+      console.error("Failed to delete product", error);
+    }
   };
 
   return { products, addProduct, updateProduct, deleteProduct };

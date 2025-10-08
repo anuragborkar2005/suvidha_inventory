@@ -2,6 +2,7 @@
 
 import api from "@/services/api";
 import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 import {
   createContext,
   useContext,
@@ -14,7 +15,7 @@ export type UserRole = "admin" | "staff";
 
 export interface User {
   id: string;
-  username: string;
+  email: string;
   role: UserRole;
   name?: string;
   exp?: number;
@@ -22,7 +23,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -34,25 +35,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("access_token");
+    const storedToken = Cookies.get("access_token");
     if (storedToken) {
       try {
         const decoded = jwtDecode<User>(storedToken);
         setUser(decoded);
       } catch (err) {
         console.error("Invalid token:", err);
-        localStorage.removeItem("access_token");
+        Cookies.remove("access_token");
       }
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (
-    username: string,
-    password: string
-  ): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const { data } = await api.post("/login", { username, password });
+      const { data } = await api.post("/login", { username: email, password });
 
       console.log("Login successful:", data);
 
@@ -60,7 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!token) return false;
 
       const decoded = jwtDecode<User>(token);
-      localStorage.setItem("access_token", token);
+      Cookies.set("access_token", token, {
+        expires: decoded.exp ? new Date(decoded.exp * 1000) : 1,
+        secure: true,
+        sameSite: "strict",
+      });
       setUser(decoded);
 
       console.log("Decoded token:", decoded);
@@ -74,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("access_token");
+    Cookies.remove("access_token");
   };
 
   return (

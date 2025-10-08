@@ -64,12 +64,17 @@ export function ProductDialog({
       cost_price: Number.parseFloat(formData.cost_price),
       selling_price: Number.parseFloat(formData.selling_price),
       stock_quantity: Number.parseInt(formData.stock_quantity),
+      profit:
+        Number.parseFloat(formData.selling_price) -
+        Number.parseFloat(formData.cost_price),
     };
 
     if (product) {
       updateProduct(product.id, productData);
+      console.log("Product updated:", productData);
     } else {
       addProduct(productData);
+      console.log("Product added:", productData);
     }
 
     onClose();
@@ -117,7 +122,7 @@ export function ProductDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cost_price">Cost Price ($)</Label>
+              <Label htmlFor="cost_price">Cost Price (₹)</Label>
               <Input
                 id="cost_price"
                 type="number"
@@ -132,7 +137,7 @@ export function ProductDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="selling_price">Selling Price ($)</Label>
+              <Label htmlFor="selling_price">Selling Price (₹)</Label>
               <Input
                 id="selling_price"
                 type="number"

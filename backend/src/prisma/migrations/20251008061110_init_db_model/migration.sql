@@ -4,7 +4,7 @@ CREATE TABLE `User` (
     `name` VARCHAR(255) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `role` ENUM('ADMIN', 'STAFF') NOT NULL DEFAULT 'STAFF',
+    `role` ENUM('admin', 'staff') NOT NULL DEFAULT 'staff',
     `refreshToken` VARCHAR(191) NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -16,11 +16,12 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `Product` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `cost_price` DECIMAL(10, 2) NOT NULL,
-    `selling_price` DECIMAL(10, 2) NOT NULL,
-    `profit` DECIMAL(10, 2) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `category` VARCHAR(191) NOT NULL DEFAULT 'general',
     `stock_quantity` INTEGER NOT NULL,
+    `cost_price` DOUBLE NOT NULL,
+    `selling_price` DOUBLE NOT NULL,
+    `profit` DOUBLE NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 

@@ -6,9 +6,10 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 const prisma = new PrismaClient();
 
 export const addProduct = async (req: Request, res: Response) => {
-  const { name, stock_quantity, cost_price, selling_price } = req.body;
+  const { name, stock_quantity, cost_price, selling_price, category } =
+    req.body;
   if (!name || !stock_quantity || !cost_price || !selling_price) {
-    return res.json(new ApiError(201, 'All fields are required'));
+    return res.json(new ApiError(400, 'All fields are required'));
   }
   const product = await prisma.product.create({
     data: {
@@ -17,6 +18,7 @@ export const addProduct = async (req: Request, res: Response) => {
       selling_price: selling_price,
       stock_quantity: stock_quantity,
       profit: selling_price - cost_price,
+      category: category,
       created_at: new Date().toISOString(),
     },
   });
@@ -28,10 +30,11 @@ export const addProduct = async (req: Request, res: Response) => {
 };
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, stock_quantity, cost_price, selling_price } = req.body;
+  const { name, stock_quantity, cost_price, selling_price, category } =
+    req.body;
 
   if (!name || !stock_quantity || !cost_price || !selling_price) {
-    return res.json(new ApiError(201, 'All fields are required'));
+    return res.json(new ApiError(400, 'All fields are required'));
   }
   const product = await prisma.product.update({
     where: {
@@ -44,6 +47,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       selling_price: selling_price,
       stock_quantity: stock_quantity,
       profit: selling_price - cost_price,
+      category: category,
       updated_at: new Date().toISOString(),
     },
   });

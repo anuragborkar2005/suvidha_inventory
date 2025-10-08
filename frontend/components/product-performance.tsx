@@ -37,7 +37,9 @@ export function ProductPerformance() {
   const productStats = useMemo(() => {
     return products
       .map((product) => {
-        const productSales = sales.filter((s) => s.product_id === product.id);
+        const productSales = sales.filter(
+          (s) => s.product_id === String(product.id)
+        );
         const totalRevenue = productSales.reduce(
           (sum, s) => sum + s.total_price,
           0
@@ -84,7 +86,7 @@ export function ProductPerformance() {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Revenue:</span>
                 <span className="font-semibold text-foreground">
-                  ${product.totalRevenue.toFixed(2)}
+                  ₹{product.totalRevenue.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -148,7 +150,7 @@ export function ProductPerformance() {
                       {product.totalQuantity}
                     </TableCell>
                     <TableCell className="font-semibold text-foreground">
-                      ${product.totalRevenue.toFixed(2)}
+                      ₹{product.totalRevenue.toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Badge

@@ -31,10 +31,6 @@ interface RecordSaleDialogProps {
   onClose: () => void;
 }
 
-function getUserId(username: string): number {
-  return username === "admin" ? 1 : 2;
-}
-
 export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
   const { user } = useAuth();
   const { products, updateProduct } = useProducts();
@@ -62,7 +58,9 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
     }
   }, [isOpen]);
 
-  const selectedProduct = products.find((p) => p.id === selectedProductId);
+  const selectedProduct = products.find(
+    (p) => String(p.id) === selectedProductId
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +80,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
 
     if (qty > selectedProduct.stock_quantity) {
       setError(
-        `Insufficient stock. Only ${selectedProduct.stock_quantity} units available.`
+        `Insufficient stock. Only ₹{selectedProduct.stock_quantity} units available.`
       );
       return;
     }
@@ -93,13 +91,11 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
 
     // Record the sale
     addSale({
-      product_id: selectedProduct.id,
+      product_id: String(selectedProduct.id),
       quantity: qty,
-      pricePerUnit: selectedProduct.selling_price,
       total_price,
       total_cost,
-      profit,
-      sold_by: getUserId(user?.username || "staff"),
+      sold_by: user?.name || "staff",
       created_at: new Date().toISOString(),
     });
 
@@ -134,10 +130,10 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
                 {products.map((product) => (
                   <SelectItem
                     key={product.id}
-                    value={product.id}
+                    value={String(product.id)}
                     className="hover:bg-accent"
                   >
-                    {product.name} - ${(product.selling_price ?? 0).toFixed(2)}{" "}
+                    {product.name} - ₹{(product.selling_price ?? 0).toFixed(2)}{" "}
                     ({product.stock_quantity ?? 0} in stock)
                   </SelectItem>
                 ))}
@@ -156,13 +152,13 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Price per Unit:</span>
                 <span className="font-medium text-foreground">
-                  ${(selectedProduct.selling_price ?? 0).toFixed(2)}
+                  ₹{(selectedProduct.selling_price ?? 0).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Profit per Unit:</span>
                 <span className="font-medium text-chart-2">
-                  $
+                  ₹
                   {(
                     (selectedProduct.selling_price ?? 0) -
                     (selectedProduct.cost_price ?? 0)
@@ -201,7 +197,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
                   Total Amount:
                 </span>
                 <span className="text-xl font-semibold text-accent-foreground">
-                  $
+                  ₹
                   {(
                     (selectedProduct.selling_price ?? 0) *
                     Number.parseInt(quantity)
@@ -211,7 +207,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Profit:</span>
                 <span className="font-semibold text-chart-2">
-                  $
+                  ₹
                   {(
                     ((selectedProduct.selling_price ?? 0) -
                       (selectedProduct.cost_price ?? 0)) *
