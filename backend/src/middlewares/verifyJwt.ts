@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from "express";
-import { ApiResponse } from "../utils/ApiResponse.js";
-import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import type { Request, Response, NextFunction } from 'express';
+import { ApiResponse } from '../utils/ApiResponse.js';
+import jwt from 'jsonwebtoken';
+import { PrismaClient, Role } from '@prisma/client';
 
 declare global {
   namespace Express {
@@ -11,85 +11,73 @@ declare global {
   }
 }
 
-const prisma = PrismaClient();
+const prisma = new PrismaClient();
 
 export const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
   const authHeaders = req.headers.authorization;
-  if (!authHeaders?.startsWith("Bearer ")) {
-    return res.json(new ApiResponse(401, null, "Unauthorized"));
+  if (!authHeaders?.startsWith('Bearer ')) {
+    return res.json(new ApiResponse(401, null, 'Unauthorized'));
   }
 
-  const token = authHeaders.split(" ")[1];
+  const token = authHeaders.split(' ')[1];
   jwt.verify(token!, process.env.JWT_SECRET_KEY!, (err, decoded) => {
     if (err) {
-      return res.json(new ApiResponse(403, null, "Forbidden"));
+      return res.json(new ApiResponse(403, null, 'Forbidden'));
     }
-    if (
-      typeof decoded === "object" &&
-      decoded !== null &&
-      "userId" in decoded
-    ) {
+    if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded) {
       req.userId = (decoded as jwt.JwtPayload).userId;
     }
     next();
   });
 };
 
-export const adminOnly = (req: Request, res: Response, next: NextFunction) => {
+export const adminOnly = async (req: Request, res: Response, next: NextFunction) => {
   const authHeaders = req.headers.authorization;
-  if (!authHeaders?.startsWith("Bearer ")) {
-    return res.json(new ApiResponse(401, null, "Unauthorized"));
+  if (!authHeaders?.startsWith('Bearer ')) {
+    return res.json(new ApiResponse(401, null, 'Unauthorized'));
   }
 
-  const token = authHeaders.split(" ")[1];
-  jwt.verify(token!, process.env.JWT_SECRET_KEY!, (err, decoded) => {
+  const token = authHeaders.split(' ')[1];
+  jwt.verify(token!, process.env.JWT_SECRET_KEY!, async (err, decoded) => {
     if (err) {
-      return res.json(new ApiResponse(403, null, "Forbidden"));
+      return res.json(new ApiResponse(403, null, 'Forbidden'));
     }
-    if (
-      typeof decoded === "object" &&
-      decoded !== null &&
-      "userId" in decoded
-    ) {
+    if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded) {
       const userId = (decoded as jwt.JwtPayload).userId;
-      const role = prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true },
       });
-      if (role === "ADMIN") {
+      if (user?.role === Role.ADMIN) {
         next();
       } else {
-        return res.json(new ApiResponse(403, null, "Forbidden"));
+        return res.json(new ApiResponse(403, null, 'Forbidden'));
       }
     }
   });
 };
 
-export const staffOnly = (req: Request, res: Response, next: NextFunction) => {
+export const staffOnly = async (req: Request, res: Response, next: NextFunction) => {
   const authHeaders = req.headers.authorization;
-  if (!authHeaders?.startsWith("Bearer ")) {
-    return res.json(new ApiResponse(401, null, "Unauthorized"));
+  if (!authHeaders?.startsWith('Bearer ')) {
+    return res.json(new ApiResponse(401, null, 'Unauthorized'));
   }
 
-  const token = authHeaders.split(" ")[1];
-  jwt.verify(token!, process.env.JWT_SECRET_KEY!, (err, decoded) => {
+  const token = authHeaders.split(' ')[1];
+  jwt.verify(token!, process.env.JWT_SECRET_KEY!, async (err, decoded) => {
     if (err) {
-      return res.json(new ApiResponse(403, null, "Forbidden"));
+      return res.json(new ApiResponse(403, null, 'Forbidden'));
     }
-    if (
-      typeof decoded === "object" &&
-      decoded !== null &&
-      "userId" in decoded
-    ) {
+    if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded) {
       const userId = (decoded as jwt.JwtPayload).userId;
-      const role = prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true },
       });
-      if (role === "STAFF") {
+      if (user?.role === Role.STAFF) {
         next();
       } else {
-        return res.json(new ApiResponse(403, null, "Forbidden"));
+        return res.json(new ApiResponse(403, null, 'Forbidden'));
       }
     }
     next();

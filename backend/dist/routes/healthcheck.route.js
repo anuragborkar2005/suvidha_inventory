@@ -1,6 +1,0 @@
-import { Router } from "express";
-import { healthCheck } from "../controllers/healthcheck.controller.js";
-const router = Router();
-router.route("/healthcheck").get(healthCheck);
-export { router as healthCheckRouter };
-//# sourceMappingURL=healthcheck.route.js.map
