@@ -121,11 +121,43 @@ export const updatePassword = async (req: Request, res: Response) => {
 };
 
 export const getStaff = async (req: Request, res: Response) => {
-  const staff = await prisma.user.findMany({
-    where: { role: Role.staff },
-  });
+  const staff = await prisma.user.findMany();
   if (!staff) {
     return res.json(new ApiError(404, 'Staff not found'));
   }
   return res.json(new ApiResponse(200, staff, 'Staff fetched successfully'));
+};
+
+export const updateStaff = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { email, role } = req.body;
+  console.log(req.body);
+
+  if (!email || !role) {
+    return res.json(new ApiError(400, 'All fields are required'));
+  }
+  const normalizedRole = String(role).toLowerCase();
+  const validRoles = Object.values(Role);
+  console.log(validRoles);
+  console.log(normalizedRole);
+
+  if (!validRoles.includes(normalizedRole as Role)) {
+    return res.status(400).json(new ApiError(400, 'Invalid role value'));
+  }
+  console.log(id);
+  console.log(role);
+
+  const staff = await prisma.user.update({
+    where: {
+      id: Number(id),
+    },
+
+    data: {
+      email: email,
+      role: normalizedRole as Role,
+      updated_at: new Date().toISOString(),
+    },
+  });
+
+  return res.json(new ApiResponse(200, staff, 'Staff updated successfully'));
 };

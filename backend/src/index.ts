@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
   credentials: true,
   origin: ['http://localhost:3000', 'http://localhost:4000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 };
 app.use(cors(corsOptions));
 

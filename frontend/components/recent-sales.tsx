@@ -21,7 +21,7 @@ export function RecentSales() {
       <CardHeader>
         <CardTitle className="text-foreground">Recent Sales</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Latest transactions in your shop
+          Latest transactions in your Suvidha
         </CardDescription>
       </CardHeader>
       <CardContent>

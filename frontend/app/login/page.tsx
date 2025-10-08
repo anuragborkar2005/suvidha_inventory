@@ -16,6 +16,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Store } from "lucide-react";
 import { useOnline } from "@/lib/use-online";
+import { Badge } from "@/components/ui/badge";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,12 +27,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { isOnline } = useOnline();
-
-  if (!isOnline) {
-    console.log("Offline");
-  } else {
-    console.log("Online");
-  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -60,12 +55,18 @@ export default function LoginPage() {
           </div>
           <div>
             <CardTitle className="text-2xl font-semibold">
-              Shop Management
+              Suvidha Management
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               Sign in to access your dashboard
               <br />
-              {isOnline ? "Online" : "Offline"}
+              <Badge
+                className={`text-xs bg-background ${
+                  isOnline ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {isOnline ? "Online" : "Offline"}
+              </Badge>
             </CardDescription>
           </div>
         </CardHeader>

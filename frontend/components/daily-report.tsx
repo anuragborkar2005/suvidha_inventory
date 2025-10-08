@@ -91,7 +91,7 @@ export function DailyReport() {
               Today&apos;s Revenue
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
-              ₹{todayStats.totalRevenue.toFixed(2)}
+              ₹{Number(todayStats.totalRevenue).toFixed(2)}
             </CardTitle>
           </CardHeader>
           <CardContent>

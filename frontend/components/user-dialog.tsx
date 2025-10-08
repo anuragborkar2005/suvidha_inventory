@@ -68,6 +68,7 @@ export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
     try {
       if (user) {
         await updateUser(user.id, {
+          email: formData.email,
           role: formData.role,
           ...(formData.password && { password: formData.password }),
         });
@@ -76,6 +77,7 @@ export function UserDialog({ isOpen, onClose, user }: UserDialogProps) {
       }
       onClose();
     } catch (err) {
+      console.log(err);
       setError("An error occurred. Please try again.");
     }
   };

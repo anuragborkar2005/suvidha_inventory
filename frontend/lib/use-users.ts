@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import api from "@/services/api";
-import { User } from "./auth-context";
+import { User } from "@/lib/auth-context";
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -38,9 +38,10 @@ export function useUsers() {
     }
   };
 
-  const updateUser = async (id: string, updates: Partial<User>) => {
+  const updateUser = async (id: string, userUpdate: Omit<User, "id">) => {
     try {
-      await api.patch(`/user/${id}`, updates);
+      const res = await api.patch(`/user/${id}`, userUpdate);
+      console.log(res);
       fetchStaff();
     } catch (error) {
       console.error("Failed to update user", error);

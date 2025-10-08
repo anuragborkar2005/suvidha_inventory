@@ -96,7 +96,7 @@ export function MonthlyReport() {
               Monthly Revenue
             </CardDescription>
             <CardTitle className="text-3xl text-foreground">
-              ₹{currentMonthStats.totalRevenue.toFixed(2)}
+              ₹{Number(currentMonthStats.totalRevenue).toFixed(2)}
             </CardTitle>
           </CardHeader>
           <CardContent>

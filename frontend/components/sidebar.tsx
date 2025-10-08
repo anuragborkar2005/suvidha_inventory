@@ -11,9 +11,10 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Store,
 } from "lucide-react";
 import { useOnline } from "@/lib/use-online";
+import { Badge } from "./ui/badge";
+import Image from "next/image";
 
 const navigation = [
   {
@@ -65,27 +66,27 @@ export function Sidebar() {
   );
 
   return (
-    <div className="flex w-64 flex-col border-r border-border bg-card">
+    <div className="flex w-72 flex-col border-r border-border bg-card">
       <div className="flex h-16 items-center gap-3 border-b border-border px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-          <Store className="h-5 w-5 text-accent-foreground" />
+          <Image src="/logo.svg" alt="logo" width={32} height={32} />
         </div>
         <div>
           <h2 className="text-sm font-semibold text-foreground">
-            Shop Manager
+            Suvidha Management
           </h2>
           <p className="text-xs text-muted-foreground capitalize">
             {user?.role} <br />
           </p>
         </div>
         <div>
-          <p
-            className={`text-xs text-muted-foreground ₹{
+          <Badge
+            className={`text-xs bg-background ${
               isOnline ? "text-green-500" : "text-red-500"
             }`}
           >
             {isOnline ? "Online" : "Offline"}
-          </p>
+          </Badge>
         </div>
       </div>
 

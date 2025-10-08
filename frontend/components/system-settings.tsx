@@ -16,18 +16,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
 interface Settings {
-  shopName: string;
   lowStockAlert: boolean;
   lowStockThreshold: number;
-  currency: string;
 }
 
 export function SystemSettings() {
   const [settings, setSettings] = useState<Settings>({
-    shopName: "My Shop",
     lowStockAlert: true,
     lowStockThreshold: 10,
-    currency: "USD",
   });
   const [saved, setSaved] = useState(false);
 
@@ -59,34 +55,9 @@ export function SystemSettings() {
         <CardHeader>
           <CardTitle className="text-foreground">General Settings</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Basic shop configuration
+            Basic Suvidha configuration
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="shopName">Shop Name</Label>
-            <Input
-              id="shopName"
-              value={settings.shopName}
-              onChange={(e) =>
-                setSettings({ ...settings, shopName: e.target.value })
-              }
-              className="bg-secondary"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
-            <Input
-              id="currency"
-              value={settings.currency}
-              onChange={(e) =>
-                setSettings({ ...settings, currency: e.target.value })
-              }
-              className="bg-secondary"
-            />
-          </div>
-        </CardContent>
       </Card>
 
       <Card className="border-border bg-card">

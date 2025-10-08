@@ -71,7 +71,7 @@ export function UserManagement() {
         </Button>
       </div>
 
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card px-4 py-4">
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
@@ -91,7 +91,7 @@ export function UserManagement() {
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={user.role === "admin" ? "default" : "secondary"}
+                    variant={user.role === "admin" ? "accent" : "secondary"}
                     className="capitalize"
                   >
                     {user.role}

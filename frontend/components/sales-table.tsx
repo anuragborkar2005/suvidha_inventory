@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useEffect } from "react";
 
 interface SalesTableProps {
   filter: "all" | "today" | "week";
