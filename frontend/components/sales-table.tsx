@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/lib/auth-context";
 
 interface SalesTableProps {
   filter: "all" | "today" | "week";
@@ -20,6 +21,7 @@ interface SalesTableProps {
 export function SalesTable({ filter }: SalesTableProps) {
   const { sales } = useSales();
   const { products } = useProducts();
+  const { user } = useAuth();
 
   const filteredSales = sales.filter((sale) => {
     const saleDate = new Date(sale.created_at);
@@ -36,11 +38,12 @@ export function SalesTable({ filter }: SalesTableProps) {
 
     return true;
   });
+  console.log(filteredSales);
 
-  const totalRevenue = filteredSales.reduce(
-    (sum, sale) => sum + sale.total_price,
-    0
-  );
+  const totalRevenue = filteredSales.reduce((sum, sale) => {
+    const product = products.find((p) => p.id === Number(sale.product_id));
+    return sum + (product?.selling_price ?? 0) * (sale.quantity ?? 0);
+  }, 0);
   const totalItems = filteredSales.reduce(
     (sum, sale) => sum + sale.quantity,
     0
@@ -59,12 +62,14 @@ export function SalesTable({ filter }: SalesTableProps) {
           <p className="text-sm text-muted-foreground">Items Sold</p>
           <p className="text-2xl font-semibold text-foreground">{totalItems}</p>
         </Card>
-        <Card className="border-border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Total Revenue</p>
-          <p className="text-2xl font-semibold text-foreground">
-            ₹{Number(totalRevenue ?? 0).toFixed(2)}
-          </p>
-        </Card>
+        {user?.role == "admin" && (
+          <Card className="border-border bg-card p-4">
+            <p className="text-sm text-muted-foreground">Total Revenue</p>
+            <p className="text-2xl font-semibold text-foreground">
+              ₹{Number(totalRevenue ?? 0).toFixed(2)}
+            </p>
+          </Card>
+        )}
       </div>
 
       <Card className="border-border bg-card px-4 py-4">

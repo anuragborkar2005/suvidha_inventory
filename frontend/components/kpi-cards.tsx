@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, AlertTriangle, TrendingUp, DollarSign } from "lucide-react";
+import { Package, AlertTriangle, TrendingUp, IndianRupee } from "lucide-react";
 import { useProducts } from "@/lib/use-products";
 import { useSales } from "@/lib/use-sales";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 export function KpiCards() {
   const { products } = useProducts();
+  const { user } = useAuth();
   const { sales, getTodayRevenue } = useSales();
   const [lowStockThreshold, setLowStockThreshold] = useState(10);
 
@@ -36,6 +38,7 @@ export function KpiCards() {
       icon: Package,
       description: "Active products in inventory",
       color: "text-primary",
+      role: ["admin", "staff"],
     },
     {
       title: "Low Stock Items",
@@ -43,6 +46,7 @@ export function KpiCards() {
       icon: AlertTriangle,
       description: "Products below threshold",
       color: "text-destructive",
+      role: ["admin", "staff"],
     },
     {
       title: "Today's Sales",
@@ -50,37 +54,43 @@ export function KpiCards() {
       icon: TrendingUp,
       description: "Transactions completed today",
       color: "text-primary",
+      role: ["admin", "staff"],
     },
     {
       title: "Today's Revenue",
       value: `₹${Number(todayRevenue ?? 0).toFixed(2)}`,
-      icon: DollarSign,
+      icon: IndianRupee,
       description: "Total revenue today",
       color: "text-primary",
+      role: ["admin"],
     },
   ];
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((kpi) => {
-        const Icon = kpi.icon;
-        return (
-          <Card key={kpi.title} className="border-border bg-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {kpi.title}
-              </CardTitle>
-              <Icon className={cn("h-5 w-5", kpi.color)} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold text-foreground">
-                {kpi.value}
-              </div>
-              <p className="text-xs text-muted-foreground">{kpi.description}</p>
-            </CardContent>
-          </Card>
-        );
-      })}
+      {kpis
+        .filter((kpi) => kpi.role.includes(user!.role))
+        .map((kpi) => {
+          const Icon = kpi.icon;
+          return (
+            <Card key={kpi.title} className="border-border bg-card">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {kpi.title}
+                </CardTitle>
+                <Icon className={cn("h-5 w-5", kpi.color)} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold text-foreground">
+                  {kpi.value}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {kpi.description}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
     </div>
   );
 }

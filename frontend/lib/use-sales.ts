@@ -41,19 +41,25 @@ export function useSales() {
 
   const addSale = async (sale: Omit<Sale, "id">) => {
     try {
+      console.log("Adding Sales", sale);
       await api.post("/sales", sale);
-      fetchSales();
       fetchSales();
     } catch (err) {
       console.error(" Failed to add sale:", err);
     }
   };
 
+  const getTotalRevenue = () => {
+    return sales.reduce((sum, s) => sum + Number(s.total_price), 0);
+  };
+
   const getTodayRevenue = () => {
     const today = new Date().toDateString();
+    console.log(sales);
+    console.log(today);
     return sales
       .filter((s) => new Date(s.created_at).toDateString() === today)
-      .reduce((sum, s) => sum + s.total_price, 0);
+      .reduce((sum, s) => sum + Number(s.total_price), 0);
   };
 
   const getTodayProfit = () => {
@@ -61,7 +67,7 @@ export function useSales() {
     return sales
       .filter((s) => new Date(s.created_at).toDateString() === today)
       .reduce((sum, s) => {
-        const profit = s.total_price - s.total_cost;
+        const profit = Number(s.total_price) - Number(s.total_cost);
         return sum + profit;
       }, 0);
   };
@@ -72,7 +78,7 @@ export function useSales() {
         const saleDate = new Date(s.created_at);
         return saleDate >= startDate && saleDate <= endDate;
       })
-      .reduce((sum, s) => sum + s.total_price, 0);
+      .reduce((sum, s) => sum + Number(s.total_price), 0);
   };
 
   const getSalesByDateRange = (startDate: Date, endDate: Date) => {
@@ -87,6 +93,7 @@ export function useSales() {
     loading,
     error,
     addSale,
+    getTotalRevenue,
     getTodayRevenue,
     getTodayProfit,
     getRevenueByDateRange,

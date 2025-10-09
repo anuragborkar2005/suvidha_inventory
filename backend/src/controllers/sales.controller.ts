@@ -37,8 +37,8 @@ export const addSales = async (req: Request, res: Response) => {
       where: { id: existingSale.id },
       data: {
         quantity: existingSale.quantity + quantity,
-        total_price: existingSale.total_price + total_price,
-        total_cost: existingSale.total_cost + total_cost,
+        total_price: Number(existingSale.total_price) + Number(total_price),
+        total_cost: Number(existingSale.total_cost) + Number(total_cost),
       },
     });
   } else {

@@ -140,7 +140,7 @@ export function DailyReport() {
             config={{
               revenue: {
                 label: "Revenue",
-                color: "hsl(var(--chart-1))",
+                color: "var(--color-chart-1)", // Optional: semantic fallback
               },
             }}
             className="h-[300px]"
@@ -149,18 +149,17 @@ export function DailyReport() {
               <BarChart data={dailyData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
+                  className="stroke-border"
                 />
                 <XAxis
                   dataKey="date"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  className="stroke-muted-foreground text-muted-foreground text-xs"
                 />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis className="stroke-muted-foreground text-muted-foreground text-xs" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar
                   dataKey="revenue"
-                  fill="hsl(var(--chart-1))"
+                  className="fill-[color:var(--color-chart-1)]"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>

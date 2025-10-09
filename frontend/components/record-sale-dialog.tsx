@@ -85,8 +85,8 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
       return;
     }
 
-    const total_price = selectedProduct.selling_price * qty;
-    const total_cost = selectedProduct.cost_price * qty;
+    const total_price = Number(selectedProduct.selling_price * qty);
+    const total_cost = Number(selectedProduct.cost_price * qty);
 
     // Record the sale
     addSale({

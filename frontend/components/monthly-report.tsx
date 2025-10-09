@@ -148,7 +148,7 @@ export function MonthlyReport() {
               config={{
                 revenue: {
                   label: "Revenue",
-                  color: "hsl(var(--chart-1))",
+                  color: "var(--color-chart-1)", // Optional fallback for external usage
                 },
               }}
               className="h-[250px]"
@@ -157,19 +157,18 @@ export function MonthlyReport() {
                 <LineChart data={monthlyData}>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="hsl(var(--border))"
+                    className="stroke-border"
                   />
                   <XAxis
                     dataKey="month"
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
+                    className="stroke-muted-foreground text-muted-foreground text-xs"
                   />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis className="stroke-muted-foreground text-muted-foreground text-xs" />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
                     type="monotone"
                     dataKey="revenue"
-                    stroke="hsl(var(--chart-1))"
+                    className="stroke-[color:var(--color-chart-1)]"
                     strokeWidth={2}
                     dot={{ r: 4 }}
                   />
@@ -191,7 +190,7 @@ export function MonthlyReport() {
               config={{
                 sales: {
                   label: "Sales",
-                  color: "hsl(var(--chart-2))",
+                  color: "var(--color-chart-2)", // Optional fallback for external chart config
                 },
               }}
               className="h-[250px]"
@@ -200,19 +199,18 @@ export function MonthlyReport() {
                 <LineChart data={monthlyData}>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="hsl(var(--border))"
+                    className="stroke-border"
                   />
                   <XAxis
                     dataKey="month"
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
+                    className="stroke-muted-foreground text-muted-foreground text-xs"
                   />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis className="stroke-muted-foreground text-muted-foreground text-xs" />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
                     type="monotone"
                     dataKey="sales"
-                    stroke="hsl(var(--chart-2))"
+                    className="stroke-[color:var(--color-chart-2)]"
                     strokeWidth={2}
                     dot={{ r: 4 }}
                   />
