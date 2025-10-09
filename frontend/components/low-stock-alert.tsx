@@ -8,11 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useProducts } from "@/lib/use-products";
+import { useProductStore } from "@/lib/use-products";
 import { AlertTriangle } from "lucide-react";
 
 export function LowStockAlert() {
-  const { products } = useProducts();
+  const products = useProductStore((s) => s.products);
   const getInitialThreshold = () => {
     // Check if window is defined for server-side rendering (SSR) compatibility
     if (typeof window === "undefined") {

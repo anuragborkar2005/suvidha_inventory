@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSales } from "@/lib/use-sales";
 import {
   Card,
   CardContent,
@@ -22,9 +21,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Sale, useSalesStore } from "@/lib/use-sales";
 
 export function DailyReport() {
-  const { sales } = useSales();
+  const sales = useSalesStore((s) => s.sales);
 
   const dailyData = useMemo(() => {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -36,7 +36,7 @@ export function DailyReport() {
     return last7Days.map((date) => {
       const dateStr = date.toDateString();
       const daySales = sales.filter(
-        (s) => new Date(s.created_at).toDateString() === dateStr
+        (s: Sale) => new Date(s.created_at).toDateString() === dateStr
       );
 
       return {
@@ -44,7 +44,10 @@ export function DailyReport() {
           month: "short",
           day: "numeric",
         }),
-        revenue: daySales.reduce((sum, s) => sum + Number(s.total_price), 0),
+        revenue: daySales.reduce(
+          (sum, s: Sale) => sum + Number(s.total_price),
+          0
+        ),
         sales: daySales.length,
       };
     });
@@ -53,20 +56,25 @@ export function DailyReport() {
   const todayStats = useMemo(() => {
     const today = new Date().toDateString();
     const todaySales = sales.filter(
-      (s) => new Date(s.created_at).toDateString() === today
+      (s: Sale) => new Date(s.created_at).toDateString() === today
     );
 
     return {
       totalSales: todaySales.length,
       totalRevenue: todaySales.reduce(
-        (sum, s) => sum + Number(s.total_price),
+        (sum, s: Sale) => sum + Number(s.total_price),
         0
       ),
-      totalItems: todaySales.reduce((sum, s) => sum + Number(s.quantity), 0),
+      totalItems: todaySales.reduce(
+        (sum, s: Sale) => sum + Number(s.quantity),
+        0
+      ),
       avgSaleValue:
         todaySales.length > 0
-          ? todaySales.reduce((sum, s) => sum + Number(s.total_price), 0) /
-            todaySales.length
+          ? todaySales.reduce(
+              (sum, s: Sale) => sum + Number(s.total_price),
+              0
+            ) / todaySales.length
           : 0,
     };
   }, [sales]);

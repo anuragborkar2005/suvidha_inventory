@@ -1,7 +1,6 @@
 "use client";
 
-import { useSales } from "@/lib/use-sales";
-import { useProducts } from "@/lib/use-products";
+import { useProductStore } from "@/lib/use-products";
 import {
   Table,
   TableBody,
@@ -12,17 +11,18 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
+import { Sale, useSalesStore } from "@/lib/use-sales";
 
 interface SalesTableProps {
   filter: "all" | "today" | "week";
 }
 
 export function SalesTable({ filter }: SalesTableProps) {
-  const { sales } = useSales();
-  const { products } = useProducts();
+  const sales = useSalesStore((s) => s.sales);
+  const products = useProductStore((s) => s.products);
   const { user } = useAuth();
 
-  const filteredSales = sales.filter((sale) => {
+  const filteredSales = sales.filter((sale: Sale) => {
     const saleDate = new Date(sale.created_at);
     const now = new Date();
 
@@ -39,12 +39,12 @@ export function SalesTable({ filter }: SalesTableProps) {
   });
   console.log(filteredSales);
 
-  const totalRevenue = filteredSales.reduce((sum, sale) => {
+  const totalRevenue = filteredSales.reduce((sum, sale: Sale) => {
     const product = products.find((p) => p.id === Number(sale.product_id));
     return sum + (product?.selling_price ?? 0) * (sale.quantity ?? 0);
   }, 0);
   const totalItems = filteredSales.reduce(
-    (sum, sale) => sum + sale.quantity,
+    (sum, sale: Sale) => sum + sale.quantity,
     0
   );
 
@@ -100,7 +100,7 @@ export function SalesTable({ filter }: SalesTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredSales.map((sale) => {
+              filteredSales.map((sale: Sale) => {
                 const product = products.find((p) => {
                   return p.id === Number(sale.product_id);
                 });

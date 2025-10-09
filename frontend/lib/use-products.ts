@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import api from "@/services/api";
+import { create } from "zustand";
 
 export interface Product {
   id: number;
@@ -14,50 +14,47 @@ export interface Product {
   created_at: string;
 }
 
-export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
+interface ProductState {
+  products: Product[];
+  addProduct: (product: Omit<Product, "id" | "created_at">) => Promise<void>;
+  updateProduct: (id: number, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: number) => Promise<void>;
+  fetchProducts: () => Promise<void>;
+}
 
-  const fetchProducts = useCallback(async () => {
-    try {
-      const response = await api.get("/product/all");
-      setProducts(response.data.data);
-      // console.log("Products fetched successfully ", response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch products", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  const addProduct = async (product: Omit<Product, "id" | "created_at">) => {
+export const useProductStore = create<ProductState>((set, get) => ({
+  products: [],
+  addProduct: async (product) => {
     try {
       await api.post("/product", product);
-      fetchProducts();
       console.log("Product added successfully");
+      get().fetchProducts();
     } catch (error) {
       console.error("Failed to add product", error);
     }
-  };
-
-  const updateProduct = async (id: number, updates: Partial<Product>) => {
+  },
+  updateProduct: async (id, updates) => {
     try {
       await api.patch(`/product/${id}`, updates);
-      fetchProducts();
+      get().fetchProducts();
     } catch (error) {
       console.error("Failed to update product", error);
     }
-  };
-
-  const deleteProduct = async (id: number) => {
+  },
+  deleteProduct: async (id) => {
     try {
       await api.delete(`/product/${id}`);
-      fetchProducts();
+      get().fetchProducts();
     } catch (error) {
       console.error("Failed to delete product", error);
     }
-  };
-
-  return { products, addProduct, updateProduct, deleteProduct, fetchProducts };
-}
+  },
+  fetchProducts: async () => {
+    try {
+      const response = await api.get("/product/all");
+      set({ products: response.data.data });
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    }
+  },
+}));

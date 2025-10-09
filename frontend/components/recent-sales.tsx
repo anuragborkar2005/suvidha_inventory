@@ -7,12 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSales } from "@/lib/use-sales";
-import { useProducts } from "@/lib/use-products";
+import { useProductStore } from "@/lib/use-products";
+import { Sale, useSalesStore } from "@/lib/use-sales";
 
 export function RecentSales() {
-  const { sales } = useSales();
-  const { products } = useProducts();
+  const sales = useSalesStore((s) => s.sales);
+  const products = useProductStore((s) => s.products);
 
   const recentSales = sales.slice(0, 5);
 
@@ -31,7 +31,7 @@ export function RecentSales() {
               No sales recorded yet
             </p>
           ) : (
-            recentSales.map((sale) => {
+            recentSales.map((sale: Sale) => {
               const product = products.find(
                 (p) => p.id === Number(sale.product_id)
               );

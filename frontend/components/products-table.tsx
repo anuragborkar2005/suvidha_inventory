@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useProducts, type Product } from "@/lib/use-products";
+import { useProductStore, type Product } from "@/lib/use-products";
 import {
   Table,
   TableBody,
@@ -31,7 +31,8 @@ interface ProductsTableProps {
 }
 
 export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
-  const { products, deleteProduct } = useProducts();
+  const products = useProductStore((s) => s.products);
+  const deleteProduct = useProductStore((s) => s.deleteProduct);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [lowStockThreshold, setLowStockThreshold] = useState(10);
 
@@ -46,6 +47,7 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  console.log(products);
 
   const handleDelete = () => {
     if (deleteId) {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSales } from "@/lib/use-sales";
 import {
   Card,
   CardContent,
@@ -22,9 +21,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Sale, useSalesStore } from "@/lib/use-sales";
 
 export function MonthlyReport() {
-  const { sales } = useSales();
+  const sales = useSalesStore((s) => s.sales);
 
   const monthlyData = useMemo(() => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
@@ -34,7 +34,7 @@ export function MonthlyReport() {
     });
 
     return last6Months.map((date) => {
-      const monthSales = sales.filter((s) => {
+      const monthSales = sales.filter((s: Sale) => {
         const saleDate = new Date(s.created_at);
         return (
           saleDate.getMonth() === date.getMonth() &&
@@ -44,16 +44,19 @@ export function MonthlyReport() {
 
       return {
         month: date.toLocaleDateString("en-US", { month: "short" }),
-        revenue: monthSales.reduce((sum, s) => sum + Number(s.total_price), 0),
+        revenue: monthSales.reduce(
+          (sum, s: Sale) => sum + Number(s.total_price),
+          0
+        ),
         sales: monthSales.length,
-        items: monthSales.reduce((sum, s) => sum + s.quantity, 0),
+        items: monthSales.reduce((sum, s: Sale) => sum + s.quantity, 0),
       };
     });
   }, [sales]);
 
   const currentMonthStats = useMemo(() => {
     const now = new Date();
-    const monthSales = sales.filter((s) => {
+    const monthSales = sales.filter((s: Sale) => {
       const saleDate = new Date(s.created_at);
       return (
         saleDate.getMonth() === now.getMonth() &&
@@ -64,14 +67,16 @@ export function MonthlyReport() {
     return {
       totalSales: monthSales.length,
       totalRevenue: monthSales.reduce(
-        (sum, s) => sum + Number(s.total_price),
+        (sum, s: Sale) => sum + Number(s.total_price),
         0
       ),
-      totalItems: monthSales.reduce((sum, s) => sum + s.quantity, 0),
+      totalItems: monthSales.reduce((sum, s: Sale) => sum + s.quantity, 0),
       avgSaleValue:
         monthSales.length > 0
-          ? monthSales.reduce((sum, s) => sum + Number(s.total_price), 0) /
-            monthSales.length
+          ? monthSales.reduce(
+              (sum, s: Sale) => sum + Number(s.total_price),
+              0
+            ) / monthSales.length
           : 0,
     };
   }, [sales]);

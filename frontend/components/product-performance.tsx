@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSales } from "@/lib/use-sales";
-import { useProducts } from "@/lib/use-products";
+import { useProductStore } from "@/lib/use-products";
 import {
   Card,
   CardContent,
@@ -20,10 +19,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from "lucide-react";
+import { Sale, useSalesStore } from "@/lib/use-sales";
 
 export function ProductPerformance() {
-  const { sales } = useSales();
-  const { products } = useProducts();
+  const sales = useSalesStore((s) => s.sales);
+  const products = useProductStore((s) => s.products);
 
   const getInitialThreshold = () => {
     // Check if window is defined for server-side rendering (SSR) compatibility
@@ -42,7 +42,7 @@ export function ProductPerformance() {
 
   const productStats = useMemo(() => {
     const salesByProductId = new Map();
-    sales.forEach((sale) => {
+    sales.forEach((sale: Sale) => {
       const productId = sale.product_id;
       const stats = salesByProductId.get(productId) || {
         totalRevenue: 0,
@@ -53,11 +53,6 @@ export function ProductPerformance() {
       stats.totalQuantity += Number(sale.quantity);
       stats.totalSales += 1;
       salesByProductId.set(productId, stats);
-      // if (stats) {
-      //   Object.entries(stats).forEach(([key, value]) => {
-      //     console.log(`${key}: ${value}`);
-      //   });
-      // }
     });
 
     return products
@@ -93,7 +88,7 @@ export function ProductPerformance() {
       <div className="grid gap-4 md:grid-cols-3">
         {topPerformers.map((product, index) => {
           const productSales = sales.filter(
-            (s) => Number(s.product_id) === product.id
+            (s: Sale) => Number(s.product_id) === product.id
           );
           return (
             <Card key={product.id} className="border-border bg-card">
@@ -114,7 +109,7 @@ export function ProductPerformance() {
                   <span className="font-semibold text-foreground">
                     ₹
                     {productSales
-                      .reduce((sum, s) => sum + Number(s.total_price), 0)
+                      .reduce((sum, s: Sale) => sum + Number(s.total_price), 0)
                       .toFixed(2)}
                   </span>
                 </div>
@@ -122,7 +117,7 @@ export function ProductPerformance() {
                   <span className="text-muted-foreground">Units Sold:</span>
                   <span className="font-semibold text-foreground">
                     {productSales.reduce(
-                      (sum, s) => sum + Number(s.quantity),
+                      (sum, s: Sale) => sum + Number(s.quantity),
                       0
                     )}
                   </span>
@@ -164,7 +159,7 @@ export function ProductPerformance() {
             <TableBody>
               {productStats.map((product) => {
                 const productSales = sales.filter(
-                  (s) => Number(s.product_id) === product.id
+                  (s: Sale) => Number(s.product_id) === product.id
                 );
 
                 // const revenue = productSales.reduce(
@@ -188,14 +183,17 @@ export function ProductPerformance() {
                     </TableCell> */}
                     <TableCell className="text-foreground">
                       {productSales.reduce(
-                        (sum, s) => sum + Number(s.quantity),
+                        (sum, s: Sale) => sum + Number(s.quantity),
                         0
                       )}
                     </TableCell>
                     <TableCell className="font-semibold text-foreground">
                       ₹
                       {productSales
-                        .reduce((sum, s) => sum + Number(s.total_price), 0)
+                        .reduce(
+                          (sum, s: Sale) => sum + Number(s.total_price),
+                          0
+                        )
                         .toFixed(2)}
                     </TableCell>
                     <TableCell>

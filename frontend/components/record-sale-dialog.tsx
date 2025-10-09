@@ -4,8 +4,6 @@ import type React from "react";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { useProducts } from "@/lib/use-products";
-import { useSales } from "@/lib/use-sales";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +24,8 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useProductStore } from "@/lib/use-products";
+import { useSalesStore } from "@/lib/use-sales";
 
 interface RecordSaleDialogProps {
   isOpen: boolean;
@@ -34,8 +34,9 @@ interface RecordSaleDialogProps {
 
 export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
   const { user } = useAuth();
-  const { products, updateProduct } = useProducts();
-  const { addSale } = useSales();
+  const products = useProductStore((s) => s.products);
+  const updateProduct = useProductStore((s) => s.updateProduct);
+  const addSales = useSalesStore((s) => s.addSales);
   const router = useRouter();
 
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -91,7 +92,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
     const total_cost = Number(selectedProduct.cost_price * qty);
 
     // Record the sale
-    addSale({
+    addSales({
       product_id: String(selectedProduct.id),
       quantity: qty,
       total_price,

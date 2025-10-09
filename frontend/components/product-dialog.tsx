@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { useProducts, type Product } from "@/lib/use-products";
+import { useProductStore, type Product } from "@/lib/use-products";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 
 interface ProductDialogProps {
   isOpen: boolean;
@@ -27,7 +26,8 @@ export function ProductDialog({
   onClose,
   product,
 }: ProductDialogProps) {
-  const { addProduct, updateProduct } = useProducts();
+  const addProduct = useProductStore((s) => s.addProduct);
+  const updateProduct = useProductStore((s) => s.updateProduct);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -35,7 +35,6 @@ export function ProductDialog({
     selling_price: "",
     stock_quantity: "",
   });
-  const router = useRouter();
 
   useEffect(() => {
     if (product) {
@@ -80,7 +79,6 @@ export function ProductDialog({
     }
 
     onClose();
-    router.refresh();
   };
 
   return (
