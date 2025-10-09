@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
 interface ProductDialogProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export function ProductDialog({
     selling_price: "",
     stock_quantity: "",
   });
+  const router = useRouter();
 
   useEffect(() => {
     if (product) {
@@ -78,6 +80,7 @@ export function ProductDialog({
     }
 
     onClose();
+    router.refresh();
   };
 
   return (

@@ -36,6 +36,8 @@ export function SystemSettings() {
 
   const handleSave = () => {
     localStorage.setItem("shop_settings", JSON.stringify(settings));
+    console.log("Settings saved:", settings);
+    console.log(localStorage.getItem("shop_settings"));
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };

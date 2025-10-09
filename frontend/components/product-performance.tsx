@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useSales } from "@/lib/use-sales";
 import { useProducts } from "@/lib/use-products";
 import {
@@ -24,38 +24,57 @@ import { TrendingUp } from "lucide-react";
 export function ProductPerformance() {
   const { sales } = useSales();
   const { products } = useProducts();
-  const [lowStockThreshold, setLowStockThreshold] = useState(10);
 
-  useEffect(() => {
-    const settings = localStorage.getItem("shop-settings");
+  const getInitialThreshold = () => {
+    // Check if window is defined for server-side rendering (SSR) compatibility
+    if (typeof window === "undefined") {
+      return 10;
+    }
+    const settings = localStorage.getItem("shop_settings");
     if (settings) {
       const parsed = JSON.parse(settings);
-      setLowStockThreshold(parsed.lowStockThreshold || 10);
+      return parsed.lowStockThreshold || 10;
     }
-  }, []);
+    return 10;
+  };
+
+  const lowStockThreshold = getInitialThreshold();
 
   const productStats = useMemo(() => {
+    const salesByProductId = new Map();
+    sales.forEach((sale) => {
+      const productId = sale.product_id;
+      const stats = salesByProductId.get(productId) || {
+        totalRevenue: 0,
+        totalQuantity: 0,
+        totalSales: 0,
+      };
+      stats.totalRevenue += Number(sale.total_price);
+      stats.totalQuantity += Number(sale.quantity);
+      stats.totalSales += 1;
+      salesByProductId.set(productId, stats);
+      // if (stats) {
+      //   Object.entries(stats).forEach(([key, value]) => {
+      //     console.log(`${key}: ${value}`);
+      //   });
+      // }
+    });
+
     return products
       .map((product) => {
-        const productSales = sales.filter(
-          (s) => s.product_id === String(product.id)
-        );
-        const totalRevenue = productSales.reduce(
-          (sum, s) => sum + s.total_price,
-          0
-        );
-        const totalQuantity = productSales.reduce(
-          (sum, s) => sum + s.quantity,
-          0
-        );
-
+        const stats = salesByProductId.get(String(product.id)) || {
+          totalRevenue: 0,
+          totalQuantity: 0,
+          totalSales: 0,
+        };
+        console.log(stats);
         return {
           id: product.id,
           name: product.name,
           category: product.category,
-          totalSales: productSales.length,
-          totalRevenue,
-          totalQuantity,
+          totalSales: stats.totalSales,
+          totalRevenue: stats.totalRevenue,
+          totalQuantity: stats.totalQuantity,
           currentStock: product.stock_quantity,
           isLowStock: product.stock_quantity <= lowStockThreshold,
         };
@@ -64,40 +83,54 @@ export function ProductPerformance() {
   }, [products, sales, lowStockThreshold]);
 
   const topPerformers = productStats.slice(0, 3);
-  const totalRevenue = productStats.reduce((sum, p) => sum + p.totalRevenue, 0);
+  // const totalRevenue = productStats.reduce(
+  //   (sum, p) => sum + Number(p.totalRevenue),
+  //   0
+  // );
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
-        {topPerformers.map((product, index) => (
-          <Card key={product.id} className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardDescription className="text-muted-foreground">
-                  #{index + 1} Top Performer
-                </CardDescription>
-                <TrendingUp className="h-4 w-4 text-chart-2" />
-              </div>
-              <CardTitle className="text-xl text-foreground">
-                {product.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Revenue:</span>
-                <span className="font-semibold text-foreground">
-                  ₹{product.totalRevenue.toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Units Sold:</span>
-                <span className="font-semibold text-foreground">
-                  {product.totalQuantity}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {topPerformers.map((product, index) => {
+          const productSales = sales.filter(
+            (s) => Number(s.product_id) === product.id
+          );
+          return (
+            <Card key={product.id} className="border-border bg-card">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardDescription className="text-muted-foreground">
+                    #{index + 1} Top Performer
+                  </CardDescription>
+                  <TrendingUp className="h-4 w-4 text-chart-2" />
+                </div>
+                <CardTitle className="text-xl text-foreground">
+                  {product.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Revenue:</span>
+                  <span className="font-semibold text-foreground">
+                    ₹
+                    {productSales
+                      .reduce((sum, s) => sum + Number(s.total_price), 0)
+                      .toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Units Sold:</span>
+                  <span className="font-semibold text-foreground">
+                    {productSales.reduce(
+                      (sum, s) => sum + Number(s.quantity),
+                      0
+                    )}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <Card className="border-border bg-card">
@@ -117,23 +150,30 @@ export function ProductPerformance() {
                 <TableHead className="text-muted-foreground">
                   Category
                 </TableHead>
-                <TableHead className="text-muted-foreground">
+                {/* <TableHead className="text-muted-foreground">
                   Sales Count
-                </TableHead>
+                </TableHead> */}
                 <TableHead className="text-muted-foreground">
                   Units Sold
                 </TableHead>
                 <TableHead className="text-muted-foreground">Revenue</TableHead>
                 <TableHead className="text-muted-foreground">Stock</TableHead>
-                <TableHead className="text-muted-foreground">Share</TableHead>
+                {/* <TableHead className="text-muted-foreground">Share</TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>
               {productStats.map((product) => {
-                const revenueShare =
-                  totalRevenue > 0
-                    ? (product.totalRevenue / totalRevenue) * 100
-                    : 0;
+                const productSales = sales.filter(
+                  (s) => Number(s.product_id) === product.id
+                );
+
+                // const revenue = productSales.reduce(
+                //   (sum, s) => sum + Number(s.total_price),
+                //   0
+                // );
+
+                // const revenueShare =
+                //   totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0;
 
                 return (
                   <TableRow key={product.id} className="border-border">
@@ -143,14 +183,20 @@ export function ProductPerformance() {
                     <TableCell className="text-muted-foreground">
                       {product.category}
                     </TableCell>
-                    <TableCell className="text-foreground">
+                    {/* <TableCell className="text-foreground">
                       {product.totalSales}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="text-foreground">
-                      {product.totalQuantity}
+                      {productSales.reduce(
+                        (sum, s) => sum + Number(s.quantity),
+                        0
+                      )}
                     </TableCell>
                     <TableCell className="font-semibold text-foreground">
-                      ₹{product.totalRevenue.toFixed(2)}
+                      ₹
+                      {productSales
+                        .reduce((sum, s) => sum + Number(s.total_price), 0)
+                        .toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -161,9 +207,9 @@ export function ProductPerformance() {
                         {product.currentStock}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-foreground">
+                    {/* <TableCell className="text-foreground">
                       {revenueShare.toFixed(1)}%
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })}

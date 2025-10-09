@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
 
 interface SalesTableProps {
@@ -87,7 +86,7 @@ export function SalesTable({ filter }: SalesTableProps) {
               <TableHead className="text-muted-foreground">
                 Total Sale
               </TableHead>
-              <TableHead className="text-muted-foreground">Sold By</TableHead>
+              {/* <TableHead className="text-muted-foreground">Sold By</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -133,11 +132,11 @@ export function SalesTable({ filter }: SalesTableProps) {
                     <TableCell className="font-semibold text-foreground">
                       ₹{Number(total_sale).toFixed(2)}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <Badge variant="secondary" className="capitalize">
                         {sale.sold_by}
                       </Badge>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })

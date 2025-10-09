@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface RecordSaleDialogProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
   const { user } = useAuth();
   const { products, updateProduct } = useProducts();
   const { addSale } = useSales();
+  const router = useRouter();
 
   const [selectedProductId, setSelectedProductId] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -104,6 +106,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
     });
 
     onClose();
+    router.refresh();
   };
 
   return (

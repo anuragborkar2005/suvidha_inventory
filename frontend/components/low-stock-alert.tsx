@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -14,15 +13,22 @@ import { AlertTriangle } from "lucide-react";
 
 export function LowStockAlert() {
   const { products } = useProducts();
-  const [lowStockThreshold, setLowStockThreshold] = useState(10);
-
-  useEffect(() => {
-    const settings = localStorage.getItem("shop-settings");
+  const getInitialThreshold = () => {
+    // Check if window is defined for server-side rendering (SSR) compatibility
+    if (typeof window === "undefined") {
+      return 10;
+    }
+    const settings = localStorage.getItem("shop_settings");
     if (settings) {
       const parsed = JSON.parse(settings);
-      setLowStockThreshold(parsed.lowStockThreshold || 10);
+      return parsed.lowStockThreshold || 10;
     }
-  }, []);
+    return 10;
+  };
+
+  const lowStockThreshold = getInitialThreshold();
+
+  console.log(lowStockThreshold);
 
   const lowStockProducts = products
     .filter((p) => p.stock_quantity <= lowStockThreshold)

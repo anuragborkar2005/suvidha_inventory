@@ -36,7 +36,7 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
   const [lowStockThreshold, setLowStockThreshold] = useState(10);
 
   useEffect(() => {
-    const settings = localStorage.getItem("shop-settings");
+    const settings = localStorage.getItem("shop_settings");
     if (settings) {
       const parsed = JSON.parse(settings);
       setLowStockThreshold(parsed.lowStockThreshold || 10);

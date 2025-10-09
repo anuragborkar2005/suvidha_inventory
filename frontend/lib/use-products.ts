@@ -59,5 +59,5 @@ export function useProducts() {
     }
   };
 
-  return { products, addProduct, updateProduct, deleteProduct };
+  return { products, addProduct, updateProduct, deleteProduct, fetchProducts };
 }

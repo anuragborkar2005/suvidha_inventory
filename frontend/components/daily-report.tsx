@@ -44,7 +44,7 @@ export function DailyReport() {
           month: "short",
           day: "numeric",
         }),
-        revenue: daySales.reduce((sum, s) => sum + s.total_price, 0),
+        revenue: daySales.reduce((sum, s) => sum + Number(s.total_price), 0),
         sales: daySales.length,
       };
     });
@@ -58,11 +58,14 @@ export function DailyReport() {
 
     return {
       totalSales: todaySales.length,
-      totalRevenue: todaySales.reduce((sum, s) => sum + s.total_price, 0),
-      totalItems: todaySales.reduce((sum, s) => sum + s.quantity, 0),
+      totalRevenue: todaySales.reduce(
+        (sum, s) => sum + Number(s.total_price),
+        0
+      ),
+      totalItems: todaySales.reduce((sum, s) => sum + Number(s.quantity), 0),
       avgSaleValue:
         todaySales.length > 0
-          ? todaySales.reduce((sum, s) => sum + s.total_price, 0) /
+          ? todaySales.reduce((sum, s) => sum + Number(s.total_price), 0) /
             todaySales.length
           : 0,
     };
