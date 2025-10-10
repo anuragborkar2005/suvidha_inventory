@@ -18,6 +18,7 @@ node_modules
 !.yarn/versions
 /backend.zip
 .backend/src.zip
+/backend\node_modules
 # testing
 /coverage
 
