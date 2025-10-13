@@ -66,7 +66,7 @@ export function Sidebar() {
   );
 
   return (
-    <div className="flex w-72 flex-col border-r border-border bg-card">
+    <div className="flex top-0 left-0 h-screen w-72 flex-col border-r border-border bg-card">
       <div className="flex h-16 items-center gap-3 border-b border-border px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
           <Image src="/logo.svg" alt="logo" width={32} height={32} />
@@ -100,9 +100,9 @@ export function Sidebar() {
               key={item.name}
               variant="ghost"
               className={cn(
-                "w-full justify-start gap-3 text-muted-foreground hover:bg-accent/10 hover:text-foreground",
+                "w-full justify-start gap-3 text-muted-foreground hover:bg-sidebar-accent-foreground/80 hover:text-white",
                 isActive &&
-                  "bg-accent/20 text-accent-foreground hover:bg-accent/20"
+                  "bg-sidebar-accent-foreground text-white hover:bg-sidebar-accent-foreground/80 hover:text-white"
               )}
               onClick={() => router.push(item.href)}
             >

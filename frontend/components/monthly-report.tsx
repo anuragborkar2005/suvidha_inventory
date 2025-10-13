@@ -45,7 +45,7 @@ export function MonthlyReport() {
       return {
         month: date.toLocaleDateString("en-US", { month: "short" }),
         revenue: monthSales.reduce(
-          (sum, s: Sale) => sum + Number(s.total_price),
+          (sum, s: Sale) => sum + Number(Number(s.total_price)),
           0
         ),
         sales: monthSales.length,
@@ -67,14 +67,14 @@ export function MonthlyReport() {
     return {
       totalSales: monthSales.length,
       totalRevenue: monthSales.reduce(
-        (sum, s: Sale) => sum + Number(s.total_price),
+        (sum, s: Sale) => sum + Number(Number(s.total_price)),
         0
       ),
       totalItems: monthSales.reduce((sum, s: Sale) => sum + s.quantity, 0),
       avgSaleValue:
         monthSales.length > 0
           ? monthSales.reduce(
-              (sum, s: Sale) => sum + Number(s.total_price),
+              (sum, s: Sale) => sum + Number(Number(s.total_price)),
               0
             ) / monthSales.length
           : 0,

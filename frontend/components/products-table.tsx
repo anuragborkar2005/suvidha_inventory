@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useProductStore, type Product } from "@/lib/use-products";
 import {
   Table,
@@ -25,6 +25,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { useLocalStorage } from "@/lib/use-local-storage";
+
 interface ProductsTableProps {
   searchQuery: string;
   onEdit: (product: Product) => void;
@@ -34,15 +36,9 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
   const products = useProductStore((s) => s.products);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [lowStockThreshold, setLowStockThreshold] = useState(10);
-
-  useEffect(() => {
-    const settings = localStorage.getItem("shop_settings");
-    if (settings) {
-      const parsed = JSON.parse(settings);
-      setLowStockThreshold(parsed.lowStockThreshold || 10);
-    }
-  }, []);
+  const [settings] = useLocalStorage("shop_settings", {
+    lowStockThreshold: 10,
+  });
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -91,7 +87,8 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
               </TableRow>
             ) : (
               filteredProducts.map((product) => {
-                const isLowStock = product.stock_quantity <= lowStockThreshold;
+                const isLowStock =
+                  product.stock_quantity <= settings.lowStockThreshold;
                 return (
                   <TableRow key={product.id} className="border-border">
                     <TableCell className="font-medium text-foreground">

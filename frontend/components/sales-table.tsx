@@ -49,7 +49,7 @@ export function SalesTable({ filter }: SalesTableProps) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">Total Sales</p>

@@ -1,61 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import api from "@/services/api";
-import { User } from "@/lib/auth-context";
+import { useEffect } from "react";
+import { useUserStore } from "@/lib/store/user-store";
 
 export function useUsers() {
-  const [users, setUsers] = useState<User[]>([]);
-
-  const fetchStaff = useCallback(async () => {
-    try {
-      const response = await api.get("/staff");
-      setUsers(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch staff", error);
-    }
-  }, []);
+  const {
+    users,
+    fetchStaff,
+    addUser,
+    updateUser,
+    deleteUser,
+  } = useUserStore();
 
   useEffect(() => {
     fetchStaff();
   }, [fetchStaff]);
-
-  const addUser = async (
-    email: string,
-    password: string,
-    role: "admin" | "staff"
-  ) => {
-    try {
-      const res = await api.post("/register", {
-        username: email,
-        password,
-        role,
-      });
-      console.log(res);
-      fetchStaff();
-    } catch (error) {
-      console.error("Failed to add user", error);
-    }
-  };
-
-  const updateUser = async (id: string, userUpdate: Omit<User, "id">) => {
-    try {
-      const res = await api.patch(`/user/${id}`, userUpdate);
-      console.log(res);
-      fetchStaff();
-    } catch (error) {
-      console.error("Failed to update user", error);
-    }
-  };
-
-  const deleteUser = async (id: string) => {
-    try {
-      await api.delete(`/user/${id}`);
-      fetchStaff();
-    } catch (error) {
-      console.error("Failed to delete user", error);
-    }
-  };
 
   return { users, addUser, updateUser, deleteUser };
 }

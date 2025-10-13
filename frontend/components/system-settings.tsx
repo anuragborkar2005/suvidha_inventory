@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -15,29 +15,21 @@ import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
+import { useLocalStorage } from "@/lib/use-local-storage";
+
 interface Settings {
   lowStockAlert: boolean;
   lowStockThreshold: number;
 }
 
 export function SystemSettings() {
-  const [settings, setSettings] = useState<Settings>({
+  const [settings, setSettings] = useLocalStorage<Settings>("shop_settings", {
     lowStockAlert: true,
     lowStockThreshold: 10,
   });
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("shop_settings");
-    if (stored) {
-      setSettings(JSON.parse(stored));
-    }
-  }, []);
-
   const handleSave = () => {
-    localStorage.setItem("shop_settings", JSON.stringify(settings));
-    console.log("Settings saved:", settings);
-    console.log(localStorage.getItem("shop_settings"));
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };

@@ -27,6 +27,8 @@ import { useRouter } from "next/navigation";
 import { useProductStore } from "@/lib/use-products";
 import { useSalesStore } from "@/lib/use-sales";
 
+import { useLocalStorage } from "@/lib/use-local-storage";
+
 interface RecordSaleDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -43,15 +45,9 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
 
-  const [lowStockThreshold, setLowStockThreshold] = useState(10);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("shop_settings");
-    if (stored) {
-      const settings = JSON.parse(stored);
-      setLowStockThreshold(settings.lowStockThreshold || 10);
-    }
-  }, []);
+  const [settings] = useLocalStorage("shop_settings", {
+    lowStockThreshold: 10,
+  });
 
   useEffect(() => {
     if (!isOpen) {
@@ -65,7 +61,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
     (p) => String(p.id) === selectedProductId
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -83,31 +79,35 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
 
     if (qty > selectedProduct.stock_quantity) {
       setError(
-        `Insufficient stock. Only ₹{selectedProduct.stock_quantity} units available.`
+        `Insufficient stock. Only ${selectedProduct.stock_quantity} units available.`
       );
       return;
     }
 
-    const total_price = Number(selectedProduct.selling_price * qty);
-    const total_cost = Number(selectedProduct.cost_price * qty);
+    try {
+      const total_price = Number(selectedProduct.selling_price * qty);
+      const total_cost = Number(selectedProduct.cost_price * qty);
 
-    // Record the sale
-    addSales({
-      product_id: String(selectedProduct.id),
-      quantity: qty,
-      total_price,
-      total_cost,
-      sold_by: user?.name || "staff",
-      created_at: new Date().toISOString(),
-    });
+      // Record the sale
+      await addSales({
+        product_id: String(selectedProduct.id),
+        quantity: qty,
+        total_price,
+        total_cost,
+        sold_by: user?.name || "staff",
+        created_at: new Date().toISOString(),
+      });
 
-    // Update product stock
-    updateProduct(selectedProduct.id, {
-      stock_quantity: selectedProduct.stock_quantity - qty,
-    });
+      // Update product stock
+      await updateProduct(selectedProduct.id, {
+        stock_quantity: selectedProduct.stock_quantity - qty,
+      });
 
-    onClose();
-    router.refresh();
+      onClose();
+      router.refresh();
+    } catch {
+      setError("Failed to record sale. Please try again.");
+    }
   };
 
   return (
@@ -168,7 +168,7 @@ export function RecordSaleDialog({ isOpen, onClose }: RecordSaleDialogProps) {
                   ).toFixed(2)}
                 </span>
               </div>
-              {selectedProduct.stock_quantity <= lowStockThreshold && (
+              {selectedProduct.stock_quantity <= settings.lowStockThreshold && (
                 <Alert variant="destructive" className="mt-2">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription className="text-xs">

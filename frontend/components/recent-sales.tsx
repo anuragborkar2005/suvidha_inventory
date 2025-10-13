@@ -45,10 +45,10 @@ export function RecentSales() {
                       {product?.name || "Unknown Product"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {sale?.product?.selling_price !== undefined
-                        ? `${
-                            sale.quantity
-                          } × ₹${sale.product?.selling_price.toFixed(2)}`
+                      {product?.selling_price !== undefined
+                        ? `${sale.quantity} × ₹${product?.selling_price.toFixed(
+                            2
+                          )}`
                         : "Price unavailable"}
                     </p>
                   </div>

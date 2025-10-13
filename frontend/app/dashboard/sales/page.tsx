@@ -39,7 +39,7 @@ export default function SalesPage() {
             <TabsTrigger value="week">This Week</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="space-y-4">
+          <TabsContent value="all" className="space-y-4 ">
             <SalesTable filter="all" />
           </TabsContent>
 

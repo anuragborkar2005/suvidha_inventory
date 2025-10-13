@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, AlertTriangle, TrendingUp, IndianRupee } from "lucide-react";
 import { useProductStore } from "@/lib/use-products";
@@ -8,23 +7,19 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { Sale, useSalesStore } from "@/lib/use-sales";
 
+import { useLocalStorage } from "@/lib/use-local-storage";
+
 export function KpiCards() {
   const products = useProductStore((s) => s.products);
   const { user } = useAuth();
   const sales = useSalesStore((s) => s.sales);
   const getTodayRevenue = useSalesStore((s) => s.getTodayRevenue);
-  const [lowStockThreshold, setLowStockThreshold] = useState(10);
-
-  useEffect(() => {
-    const settings = localStorage.getItem("shop_settings");
-    if (settings) {
-      const parsed = JSON.parse(settings);
-      setLowStockThreshold(parsed.lowStockThreshold || 10);
-    }
-  }, []);
+  const [settings] = useLocalStorage("shop_settings", {
+    lowStockThreshold: 10,
+  });
 
   const lowStockCount = products.filter(
-    (p) => p.stock_quantity <= lowStockThreshold
+    (p) => p.stock_quantity <= settings.lowStockThreshold
   ).length;
   const todaySalesCount = sales.filter((s: Sale) => {
     const today = new Date().toDateString();

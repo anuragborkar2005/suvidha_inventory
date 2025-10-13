@@ -16,7 +16,7 @@ export interface Sale {
 }
 
 interface SalesState {
-  sales: [];
+  sales: Sale[];
   fetchSales: () => Promise<void>;
   addSales: (sale: Omit<Sale, "id">) => Promise<void>;
   getTotalRevenue: () => number;
@@ -42,7 +42,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
       await api.post("/sales", sale);
       get().fetchSales();
     } catch (err) {
-      console.error(" Failed to add sale:", err);
+      console.error("Failed to add sale:", err);
+      throw err;
     }
   },
   getTotalRevenue: () => {
@@ -51,32 +52,28 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   getTodayRevenue: () => {
     const today = new Date().toDateString();
     return get()
-      .sales.filter(
-        (s: Sale) => new Date(s.created_at).toDateString() === today
-      )
-      .reduce((sum, s: Sale) => sum + Number(s.total_price), 0);
+      .sales.filter((s) => new Date(s.created_at).toDateString() === today)
+      .reduce((sum, s) => sum + Number(s.total_price), 0);
   },
   getTodayProfit: () => {
     const today = new Date().toDateString();
     return get()
-      .sales.filter(
-        (s: Sale) => new Date(s.created_at).toDateString() === today
-      )
-      .reduce((sum, s: Sale) => {
+      .sales.filter((s) => new Date(s.created_at).toDateString() === today)
+      .reduce((sum, s) => {
         const profit = Number(s.total_price) - Number(s.total_cost);
         return sum + profit;
       }, 0);
   },
   getRevenueByDateRange: (startDate: Date, endDate: Date) => {
     return get()
-      .sales.filter((s: Sale) => {
+      .sales.filter((s) => {
         const saleDate = new Date(s.created_at);
         return saleDate >= startDate && saleDate <= endDate;
       })
-      .reduce((sum, s: Sale) => sum + Number(s.total_price), 0);
+      .reduce((sum, s) => sum + Number(s.total_price), 0);
   },
   getSalesByDateRange: (startDate: Date, endDate: Date) => {
-    return get().sales.filter((s: Sale) => {
+    return get().sales.filter((s) => {
       const saleDate = new Date(s.created_at);
       return saleDate >= startDate && saleDate <= endDate;
     });
