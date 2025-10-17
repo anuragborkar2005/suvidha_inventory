@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -9,38 +8,45 @@ datasource db {
 }
 
 enum Role {
-  ADMIN
-  STAFF
+  admin
+  staff
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(255)
-  email      String   @unique
-  password   String   @db.VarChar(255)
-  role       Role     @default(STAFF)
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  email        String   @unique
+  password     String   @db.VarChar(255)
+  role         Role     @default(staff)
   refreshToken String?
-  created_at DateTime @default(now())
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
 
 model Product {
-  id             Int      @id @default(autoincrement())
-  name           String   @db.VarChar(255)
-  cost_price     Decimal  @db.Decimal(10,2)
-  selling_price  Decimal  @db.Decimal(10,2)
-  profit         Decimal  @db.Decimal(10,2)
-  stock_quantity Int
-  created_at     DateTime @default(now())
-  sales          Sale[]
+  id              Int      @id @default(autoincrement())
+  name            String
+  category        String   @default("general")
+  stock_quantity  Int
+  stock_threshold Int      @default(30)
+  cost_price      Float
+  selling_price   Float
+  profit          Float
+  sales           Sale[]
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 }
 
 model Sale {
   id          Int      @id @default(autoincrement())
   product_id  Int
-  sold_by     Int
   quantity    Int
   total_price Decimal  @db.Decimal(10,2)
   total_cost  Decimal  @db.Decimal(10,2)
   created_at  DateTime @default(now())
-  product     Product  @relation(fields: [product_id], references: [id])
+  updated_at  DateTime @updatedAt
+
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([product_id])
 }

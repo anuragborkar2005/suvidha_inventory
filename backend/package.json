@@ -4,28 +4,54 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc && cp -r src/generated dist/generated",
+    "build": "npx tsc",
     "dev": "nodemon ./dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml}": [
+      "prettier --write"
+    ]
+  },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/json2csv": "^5.0.7",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.6.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3",
+    "prettier": "^3.6.2",
     "prisma": "^6.16.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
+    "@types/exceljs": "^0.5.3",
+    "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
+    "express-winston": "^4.2.0",
     "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.18.3"
   }
 }

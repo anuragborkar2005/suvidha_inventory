@@ -1,0 +1,118 @@
+import { PrismaClient } from '@prisma/client';
+import { ApiError } from '../utils/ApiError.js';
+import type { Request, Response } from 'express';
+import { ApiResponse } from '../utils/ApiResponse.js';
+
+const prisma = new PrismaClient();
+
+export const addProduct = async (req: Request, res: Response) => {
+  const { name, stock_quantity, cost_price, selling_price, category, stock_threshold } = req.body;
+  if (!name || !stock_quantity || !cost_price || !selling_price) {
+    return res.json(new ApiError(400, 'All fields are required'));
+  }
+  const product = await prisma.product.create({
+    data: {
+      name: name,
+      cost_price: cost_price,
+      selling_price: selling_price,
+      stock_quantity: stock_quantity,
+      stock_threshold: stock_threshold ? Number(stock_threshold) : Math.round(stock_quantity * 0.3),
+      profit: selling_price - cost_price,
+      category: category,
+      created_at: new Date().toISOString(),
+    },
+  });
+
+  if (!product) {
+    return res.json(new ApiError(404, 'Product not found'));
+  }
+  return res.json(new ApiResponse(200, product, 'Product added successfully'));
+};
+export const updateProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, stock_quantity, cost_price, selling_price, category } = req.body;
+
+  if (!name || !stock_quantity || !cost_price || !selling_price) {
+    return res.json(new ApiError(400, 'All fields are required'));
+  }
+  const product = await prisma.product.update({
+    where: {
+      id: Number(id),
+    },
+
+    data: {
+      name: name,
+      cost_price: cost_price,
+      selling_price: selling_price,
+      stock_quantity: stock_quantity,
+      profit: selling_price - cost_price,
+      category: category,
+      updated_at: new Date().toISOString(),
+    },
+  });
+
+  if (!product) {
+    return res.json(new ApiError(404, 'Product not found'));
+  } else {
+    return res.json(new ApiResponse(200, product, 'Product updated successfully'));
+  }
+};
+export const deleteProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const product = await prisma.product.delete({
+    where: {
+      id: Number(id),
+    },
+  });
+  if (!product) {
+    return res.json(new ApiError(404, 'Product not found'));
+  }
+
+  return res.json(new ApiResponse(200, product, 'Product deleted successfully'));
+};
+export const getProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const product = await prisma.product.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!product) {
+    return res.json(new ApiError(404, 'Product not found'));
+  }
+
+  return res.json(new ApiResponse(200, product, 'Product fetched successfully'));
+};
+export const getProducts = async (req: Request, res: Response) => {
+  const products = await prisma.product.findMany();
+  if (!products) {
+    return res.json(new ApiError(404, 'Products not found'));
+  }
+  return res.json(new ApiResponse(200, products, 'Products fetched successfully'));
+};
+
+export const updateStockThreshold = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { stock_threshold } = req.body;
+
+  if (!stock_threshold) {
+    return res.json(new ApiError(400, 'Stock threshold is required'));
+  }
+  const product = await prisma.product.update({
+    where: {
+      id: Number(id),
+    },
+
+    data: {
+      stock_threshold: stock_threshold,
+      updated_at: new Date().toISOString(),
+    },
+  });
+
+  if (!product) {
+    return res.json(new ApiError(404, 'Product not found'));
+  } else {
+    return res.json(new ApiResponse(200, product, 'Stock threshold updated successfully'));
+  }
+};
