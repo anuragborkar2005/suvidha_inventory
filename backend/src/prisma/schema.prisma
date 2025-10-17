@@ -28,6 +28,7 @@ model Product {
   name            String
   category        String   @default("general")
   stock_quantity  Int
+  stock_threshold Int      @default(30)
   cost_price      Float
   selling_price   Float
   profit          Float

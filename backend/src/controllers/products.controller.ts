@@ -6,8 +6,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 const prisma = new PrismaClient();
 
 export const addProduct = async (req: Request, res: Response) => {
-  const { name, stock_quantity, cost_price, selling_price, category } =
-    req.body;
+  const { name, stock_quantity, cost_price, selling_price, category, stock_threshold } = req.body;
   if (!name || !stock_quantity || !cost_price || !selling_price) {
     return res.json(new ApiError(400, 'All fields are required'));
   }
@@ -17,6 +16,7 @@ export const addProduct = async (req: Request, res: Response) => {
       cost_price: cost_price,
       selling_price: selling_price,
       stock_quantity: stock_quantity,
+      stock_threshold: stock_threshold ? Number(stock_threshold) : Math.round(stock_quantity * 0.3),
       profit: selling_price - cost_price,
       category: category,
       created_at: new Date().toISOString(),
@@ -30,8 +30,7 @@ export const addProduct = async (req: Request, res: Response) => {
 };
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, stock_quantity, cost_price, selling_price, category } =
-    req.body;
+  const { name, stock_quantity, cost_price, selling_price, category } = req.body;
 
   if (!name || !stock_quantity || !cost_price || !selling_price) {
     return res.json(new ApiError(400, 'All fields are required'));
@@ -91,4 +90,29 @@ export const getProducts = async (req: Request, res: Response) => {
     return res.json(new ApiError(404, 'Products not found'));
   }
   return res.json(new ApiResponse(200, products, 'Products fetched successfully'));
+};
+
+export const updateStockThreshold = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { stock_threshold } = req.body;
+
+  if (!stock_threshold) {
+    return res.json(new ApiError(400, 'Stock threshold is required'));
+  }
+  const product = await prisma.product.update({
+    where: {
+      id: Number(id),
+    },
+
+    data: {
+      stock_threshold: stock_threshold,
+      updated_at: new Date().toISOString(),
+    },
+  });
+
+  if (!product) {
+    return res.json(new ApiError(404, 'Product not found'));
+  } else {
+    return res.json(new ApiResponse(200, product, 'Stock threshold updated successfully'));
+  }
 };

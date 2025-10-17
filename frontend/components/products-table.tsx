@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Edit, Trash2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
@@ -25,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { useLocalStorage } from "@/lib/use-local-storage";
+
 
 interface ProductsTableProps {
   searchQuery: string;
@@ -35,10 +36,15 @@ interface ProductsTableProps {
 export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
   const products = useProductStore((s) => s.products);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
+  const updateStockThreshold = useProductStore((s) => s.updateStockThreshold);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [settings] = useLocalStorage("shop_settings", {
-    lowStockThreshold: 10,
-  });
+  const [threshold, setThreshold] = useState<{[key: number]: number}>({});
+
+  const handleThresholdChange = (id: number) => {
+    if (threshold[id]) {
+      updateStockThreshold(id, threshold[id]);
+    }
+  };
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -69,6 +75,7 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
                 Selling Price
               </TableHead>
               <TableHead className="text-muted-foreground">Stock</TableHead>
+              <TableHead className="text-muted-foreground">Stock Threshold</TableHead>
               <TableHead className="text-muted-foreground">Status</TableHead>
               <TableHead className="text-right text-muted-foreground">
                 Actions
@@ -88,7 +95,7 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
             ) : (
               filteredProducts.map((product) => {
                 const isLowStock =
-                  product.stock_quantity <= settings.lowStockThreshold;
+                  product.stock_quantity <= product.stock_threshold;
                 return (
                   <TableRow key={product.id} className="border-border">
                     <TableCell className="font-medium text-foreground">
@@ -109,6 +116,27 @@ export function ProductsTable({ searchQuery, onEdit }: ProductsTableProps) {
                         {isLowStock && (
                           <AlertTriangle className="h-4 w-4 text-destructive" />
                         )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          defaultValue={product.stock_threshold}
+                          onChange={(e) =>
+                            setThreshold({
+                              ...threshold,
+                              [product.id]: Number(e.target.value),
+                            })
+                          }
+                          className="w-20"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => handleThresholdChange(product.id)}
+                        >
+                          Save
+                        </Button>
                       </div>
                     </TableCell>
                     <TableCell>

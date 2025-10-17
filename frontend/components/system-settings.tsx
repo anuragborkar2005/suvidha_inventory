@@ -16,6 +16,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
 import { useLocalStorage } from "@/lib/use-local-storage";
+import api from "@/services/api";
+import { useAuth } from "@/lib/auth-context";
 
 interface Settings {
   lowStockAlert: boolean;
@@ -29,9 +31,44 @@ export function SystemSettings() {
   });
   const [saved, setSaved] = useState(false);
 
+  const { user } = useAuth();
+
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handlePasswordChange = async () => {
+    if (password !== confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      const response = await api.patch("/update-password", {
+        emailId: user?.email,
+        password,
+      });
+      if (response.status === 200) {
+        alert("Password changed successfully");
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        alert("Failed to change password");
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      }
+      alert("An unexpected error occurred");
+    }
   };
 
   return (
@@ -52,6 +89,37 @@ export function SystemSettings() {
             Basic Suvidha configuration
           </CardDescription>
         </CardHeader>
+      </Card>
+
+      <Card className="border-border bg-card">
+        <CardHeader>
+          <CardTitle className="text-foreground">Change Password</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Update your account password
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="newPassword">New Password</Label>
+            <Input
+              id="newPassword"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-secondary"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="bg-secondary"
+            />
+          </div>
+        </CardContent>
       </Card>
 
       <Card className="border-border bg-card">
@@ -108,7 +176,13 @@ export function SystemSettings() {
         </Alert>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <Button
+          onClick={handlePasswordChange}
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
+        >
+          Save Password
+        </Button>
         <Button
           onClick={handleSave}
           className="bg-accent text-accent-foreground hover:bg-accent/90"

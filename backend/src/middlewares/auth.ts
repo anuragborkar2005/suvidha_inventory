@@ -13,7 +13,7 @@ declare global {
 
 const prisma = new PrismaClient();
 
-export const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
+export const auth = (req: Request, res: Response, next: NextFunction) => {
   const authHeaders = req.headers.authorization;
   if (!authHeaders?.startsWith('Bearer ')) {
     return res.json(new ApiResponse(401, null, 'Unauthorized'));

@@ -98,16 +98,15 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const updatePassword = async (req: Request, res: Response) => {
-  const { password } = req.body;
-  if (!password) {
+  const { emailId, password } = req.body;
+  if (!emailId || !password) {
     return res.json(new ApiError(201, 'Password is required'));
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const userId = req.userId;
   const user = await prisma.user.update({
-    where: { id: Number(userId) },
+    where: { email: emailId },
     data: {
       password: hashedPassword,
     },

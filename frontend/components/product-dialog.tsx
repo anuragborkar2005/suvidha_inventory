@@ -34,6 +34,7 @@ export function ProductDialog({
     cost_price: "",
     selling_price: "",
     stock_quantity: "",
+    stock_threshold: "",
   });
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export function ProductDialog({
         cost_price: product.cost_price.toString(),
         selling_price: product.selling_price.toString(),
         stock_quantity: product.stock_quantity.toString(),
+        stock_threshold: product.stock_threshold.toString(),
       });
     } else {
       setFormData({
@@ -52,6 +54,7 @@ export function ProductDialog({
         cost_price: "",
         selling_price: "",
         stock_quantity: "",
+        stock_threshold: "",
       });
     }
   }, [product, isOpen]);
@@ -59,12 +62,17 @@ export function ProductDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const stockQuantity = Number.parseInt(formData.stock_quantity);
+
     const productData = {
       name: formData.name,
       category: formData.category,
       cost_price: Number.parseFloat(formData.cost_price),
       selling_price: Number.parseFloat(formData.selling_price),
-      stock_quantity: Number.parseInt(formData.stock_quantity),
+      stock_quantity: stockQuantity,
+      stock_threshold: formData.stock_threshold
+        ? Number(formData.stock_threshold)
+        : 0,
       profit:
         Number.parseFloat(formData.selling_price) -
         Number.parseFloat(formData.cost_price),
@@ -153,18 +161,32 @@ export function ProductDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="stock_quantity">Stock Quantity</Label>
-            <Input
-              id="stock_quantity"
-              type="number"
-              value={formData.stock_quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, stock_quantity: e.target.value })
-              }
-              required
-              className="bg-secondary"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="stock_quantity">Stock Quantity</Label>
+              <Input
+                id="stock_quantity"
+                type="number"
+                value={formData.stock_quantity}
+                onChange={(e) =>
+                  setFormData({ ...formData, stock_quantity: e.target.value })
+                }
+                required
+                className="bg-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stock_threshold">Stock Threshold</Label>
+              <Input
+                id="stock_threshold"
+                type="number"
+                value={formData.stock_threshold}
+                onChange={(e) =>
+                  setFormData({ ...formData, stock_threshold: e.target.value })
+                }
+                className="bg-secondary"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
